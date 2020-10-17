@@ -1,0 +1,60 @@
+@prefix: default;
+
+input,
+select {
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  width: 100%;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+}
+
+.@{prefix}-form-item {
+  position: relative;
+  margin-bottom: 20px;
+  &-inner {
+    overflow: hidden;
+  }
+
+  &-label {
+    margin-bottom: 5px;
+  }
+
+  &-content {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  &-tips {
+    margin-bottom: 2px;
+  }
+
+  &-error {
+    position: absolute;
+    font-size: 12px;
+    top: 100%;
+  }
+
+  @form-item: @{prefix}-form-item;
+
+  &-with-error {
+    .@{form-item}-label,
+    .@{form-item}-content,
+    .@{form-item}-tips,
+    .@{form-item}-error {
+      color: red;
+    }
+
+    .@{form-item}-content {
+      input,
+      select {
+        border-color: red;
+        color: red;
+      }
+    }
+  }
+}
