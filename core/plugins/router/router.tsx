@@ -55,7 +55,6 @@ const resolveRoutes: () => Array<RouteRecordRaw> = () => {
       const _state = reactive(r.config?.state || {});
       return {
         title: r.config?.title || appTitle,
-        api: r.config || {},
         state: _state
       } as PageState<any>;
     };

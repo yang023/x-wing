@@ -4,9 +4,6 @@ import { RouteRecordRaw } from "vue-router";
 export type PageConfig<T extends object> = {
   title?: string;
   state?: T;
-  api?: {
-    [key: string]: DateSource;
-  };
 };
 
 export type PageState<T> = {
