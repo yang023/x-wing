@@ -1,10 +1,11 @@
 import { defineComponent } from "vue";
 
-import { createForm, XForm } from "@core/plugins/form";
+import { createForm, onFormValueChange, XForm } from "@core/plugins/form";
 
 type Data = {
-  a: string;
-  b: string;
+  a: string | Date;
+  b1: string;
+  b2: string;
 };
 
 export default defineComponent(() => {
@@ -24,16 +25,33 @@ export default defineComponent(() => {
         type: "checkbox",
         eumns: [
           { title: "A", value: "a" },
-          { title: "B", value: "b" }
+          { title: "B", value: "b" },
+          { title: "C", value: "c" }
         ],
         label: "B",
         defaultValue: [],
+        sourceFormat: "[b1,b2]",
+        valueFormat: "{0:b1,1:b2}",
         rules: { required: true, message: "错误" }
       }
     ]
   });
 
   form.create();
+
+  form.setData(resolve => {
+    setTimeout(() => {
+      resolve({
+        a: new Date("2020-10-01 01:01"),
+        b1: "a",
+        b2: "b"
+      });
+    }, 1000);
+  });
+
+  onFormValueChange<Data>(val => {
+    console.log(val);
+  });
 
   return () => (
     <div style="width: 500px;margin:10px auto">

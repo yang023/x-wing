@@ -212,20 +212,36 @@ export default defineComponent(() => {
   * rules: 可选，async-validator 的配置
   * valueFormat: 可选，字段解构用，默认为 name 值
 
-#### 字段解构
-第三方组件中，DatePicker 的范围选择器的 value 一般为数组，但待提交的表单数据通常为一维字段对象，使用 valueFormat 对数据进行解构设置：
+#### 字段转换与解构
+第三方组件中，DatePicker 的范围选择器的 value 一般为数组，但待提交的表单数据通常为一维字段对象，使用 valueFormat 对数据进行解构设置，使用 sourceFormat 对输入数据进行转换：
 ```
 解构规则
-valueFormat: {0:startTime,1endTime}
+valueFormat: "{0:startTime,1endTime}"
 
-源数据
+字段数据
 value: [Date(2020-10-01), Date(2020-10-08)];
 
 解构结果
 {
+  // ...
   startTime: Date(2020-10-01),
   endTime: Date(2020-10-08)
 }
+
+转换规则：
+sourceFormat: "{0:b1,1:b2}"
+
+输入实体：
+{
+  // ...
+  startTime: Date(2020-10-01),
+  endTime: Date(2020-10-08)
+}
+
+转换结果：
+value: [Date(2020-10-01), Date(2020-10-08)];
+
+
 ```
 
 #### 事件驱动

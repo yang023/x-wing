@@ -17,6 +17,7 @@ class Field implements FieldCore {
   readonly state: StateCore<ReadonlyFieldState, ChangeableFieldState>;
   readonly display: Required<FieldDisplay>;
   readonly valueFormat: string;
+  readonly sourceFormat: string;
   value: any;
   initialValue: any;
 
@@ -28,6 +29,7 @@ class Field implements FieldCore {
     this.type = props.type || "input";
     this.rules = props.rules as RuleItem | RuleItem[];
     this.valueFormat = props.valueFormat || props.name;
+    this.sourceFormat = props.sourceFormat || props.name;
 
     this.display = {
       label: props.label || "",

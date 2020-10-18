@@ -24,6 +24,7 @@ export type DefaultFieldProps = {
   rules: RuleItem | RuleItem[];
   defaultValue: any;
   valueFormat: string; // it's name is the default
+  sourceFormat: string; // it's name is the default
 };
 export type DisplayFieldProps = {
   label: string;
@@ -97,6 +98,7 @@ export interface FieldCore {
   readonly type: FieldType;
   readonly rules: RuleItem | RuleItem[];
   valueFormat: string;
+  sourceFormat: string;
   value: any;
   initialValue?: any;
 

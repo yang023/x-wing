@@ -106,19 +106,9 @@ class Form<T> implements FormCore<T> {
     setter: (field: FieldCore, value: any) => void,
     callback: () => void
   ) {
-    const stack = [...Object.keys(_data)];
-
-    while (stack.length > 0) {
-      const key = stack.pop();
-      if (!key) {
-        continue;
-      }
-      const field = this.getField(key);
-      if (field === null) {
-        continue;
-      }
-      setter(field, Path.getIn(_data, key));
-    }
+    this.getFields("*").forEach(field => {
+      setter(field, Path.getIn(_data, field.sourceFormat));
+    });
 
     callback();
   }
