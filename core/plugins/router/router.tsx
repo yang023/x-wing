@@ -1,4 +1,6 @@
-import { App, defineAsyncComponent, defineComponent, reactive } from "vue";
+import { App, defineAsyncComponent, defineComponent } from "vue";
+import { Module } from "vuex";
+import Store from "../store";
 import {
   createRouter,
   createWebHashHistory,
@@ -10,6 +12,45 @@ import { ExtRoute, PageRoutesConfig, PageConfig, PageState } from "./types";
 import appConfig from "@/app.config.json";
 import DefaultLayout from "./DefaultLayout";
 
+/**
+ * 创建 Vuex.Store 的 Module，其中，state 支持与 localStorage 同步
+ * @param options vuex 模块配置
+ */
+const createStore = (
+  name: string,
+  options: Module<any, any>
+): Module<any, any> => {
+  if (options.state) {
+    options.state = new Proxy(options.state, {
+      get: (target, _name) => {
+        if (
+          _name === Symbol.toStringTag ||
+          String(_name).startsWith("__v_") ||
+          _name === "toJSON"
+        ) {
+          return Reflect.get(target, _name);
+        }
+        const _val = localStorage.getItem(`STORE:${name}/${String(_name)}`);
+        Reflect.set(target, _name, _val);
+        return _val;
+      },
+      set: (target, _name, _val) => {
+        localStorage.setItem(`STORE:${name}/${String(_name)}`, _val);
+        Reflect.set(target, _name, _val);
+        return true;
+      }
+    });
+  }
+  return {
+    namespaced: true,
+    ...options
+  };
+};
+
+/**
+ * 根据 views 结构创建路由配置
+ * TODO: 多层级结构
+ */
 const resolveRoutes: () => Array<RouteRecordRaw> = () => {
   const configContext = require.context("@/views", true, /.*config.(t|j)s$/);
   const layoutContext = require.context(
@@ -21,7 +62,13 @@ const resolveRoutes: () => Array<RouteRecordRaw> = () => {
   const context = require.context(
     "@/views",
     true,
-    /.*(\/index.(vue|(t|j)sx?)|\/config.(t|j)s|\/layout.(vue|(t|j)sx?)$)/,
+    /.*(\/index.(vue|(t|j)sx?)|(\/store\/.*\.(t|j)sx?)|\/config.(t|j)s|\/layout.(vue|(t|j)sx?)$)/,
+    "lazy"
+  );
+  const store = require.context(
+    "@/views",
+    true,
+    /.*(\/store\/.*\.(t|j)sx?)$/,
     "lazy"
   );
   const reducer: (result: PageRoutesConfig, key: string) => PageRoutesConfig = (
@@ -39,6 +86,14 @@ const resolveRoutes: () => Array<RouteRecordRaw> = () => {
       config.config = configContext(key).default;
     } else if (/layout.(vue|tsx?)$/.test(key)) {
       config.layout = key;
+    } else if (/.*\/store\/.*/.test(key)) {
+      if (!config.state) {
+        config.state = {};
+      }
+      const storeKey = key.replace(/.*store\/|(\.(j|t)sx?)/g, "");
+      if (["state", "mutations", "actions", "getters"].includes(storeKey)) {
+        config.state[storeKey] = key;
+      }
     } else {
       config.file = key;
     }
@@ -52,12 +107,35 @@ const resolveRoutes: () => Array<RouteRecordRaw> = () => {
   const routes = [] as Array<RouteRecordRaw>;
   routesConfig.forEach(r => {
     const resolveConfig: () => PageConfig<any> = () => {
-      const _state = reactive(r.config?.state || {});
       return {
         title: r.config?.title || appTitle,
-        state: _state
+        state: r.config?.state || {}
       } as PageState<any>;
     };
+
+    if (r.state) {
+      const promises = Object.keys(r.state).map(key => {
+        return store(r.state?.[key]).then((m: { default: any }) => {
+          return {
+            module: m.default,
+            key: key
+          };
+        });
+      });
+
+      Promise.all(promises)
+        .then((m: { module: any; key: string }[]) => {
+          return m.reduce((res, i) => {
+            res[i.key as keyof Module<any, any>] = i.module;
+
+            return r;
+          }, {} as Module<any, any>);
+        })
+        .then(c => {
+          const _module = createStore(r.name, c);
+          Store.registerModule(r.name, _module);
+        });
+    }
 
     const Layout = r.layout
       ? defineAsyncComponent(() => layoutContext(r.layout as string))

@@ -1,84 +1,12 @@
 import { defineComponent } from "vue";
-
-import { createForm, onFormValueChange, XForm } from "@core/plugins/form";
-
-type Data = {
-  a: string | Date;
-  b1: string;
-  b2: string;
-};
+import { useState, useMutations } from "@core/plugins/store/storeContext";
 
 export default defineComponent(() => {
-  const { form } = createForm<Data>({
-    id: "1",
-    fields: [
-      {
-        name: "a",
-        label: "A",
-        type: "datetime",
-        tips: "123",
-        defaultValue: new Date(),
-        rules: { required: true, message: "错误" }
-      },
-      {
-        name: "b",
-        type: "checkbox",
-        eumns: [
-          { title: "A", value: "a" },
-          { title: "B", value: "b" },
-          { title: "C", value: "c" }
-        ],
-        label: "B",
-        defaultValue: [],
-        sourceFormat: "[b1,b2]",
-        valueFormat: "{0:b1,1:b2}",
-        rules: { required: true, message: "错误" }
-      }
-    ]
-  });
+  const state = useState("index");
 
-  form.create();
-
-  form.setData(resolve => {
-    setTimeout(() => {
-      resolve({
-        a: new Date("2020-10-01 01:01"),
-        b1: "a",
-        b2: "b"
-      });
-    }, 1000);
-  });
-
-  onFormValueChange<Data>(val => {
-    console.log(val);
-  });
-
-  return () => (
-    <div style="width: 500px;margin:10px auto">
-      <XForm form={form}></XForm>
-      <button
-        onClick={() => {
-          form.validate(errors => {
-            console.log(errors);
-          });
-        }}
-      >
-        Validate
-      </button>
-      <button
-        onClick={() => {
-          form.clearData();
-        }}
-      >
-        ClearData
-      </button>
-      <button
-        onClick={() => {
-          form.resetData();
-        }}
-      >
-        ResetData
-      </button>
-    </div>
-  );
+  const mutations = useMutations("index");
+  setTimeout(() => {
+    mutations("TEST", Math.random());
+  }, 1000);
+  return () => <div>{JSON.stringify(state)}</div>;
 });

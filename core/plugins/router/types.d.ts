@@ -17,6 +17,9 @@ export type PageMetaConfig = {
   config?: PageConfig<any>;
   file?: string;
   layout?: string;
+  state?: {
+    [name: string]: any;
+  };
 };
 
 export type PageRoutesConfig = {

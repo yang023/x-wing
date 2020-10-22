@@ -2,6 +2,7 @@ import { createApp, defineComponent, App, Component, Plugin } from "vue";
 import { RouterView } from "vue-router";
 
 import router from "./plugins/router";
+import store from "./plugins/store";
 
 const layoutContext = require.context("@/", false, /layout.(vue|(j|t)sx?)/);
 const DefaultLayout = defineComponent((_props, { slots }) => {
@@ -36,6 +37,7 @@ const starter = async (config?: {
     )
   );
   config?.preset?.(_app);
+  _app.use(store);
   _app.use(router);
   plugins.forEach(plugin => {
     _app.use(plugin);
