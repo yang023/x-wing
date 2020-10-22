@@ -39,8 +39,6 @@ const useField = (field: FieldCore) => {
   const option = ref(field.display);
   onFieldOptionChange(field.name, "*", () => {
     setTimeout(() => {
-      console.log(field.display);
-
       option.value = { ...field.display };
     });
   });
