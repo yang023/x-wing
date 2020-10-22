@@ -4,6 +4,8 @@ import { RouterView } from "vue-router";
 import router from "./plugins/router";
 import store from "./plugins/store";
 
+import "./plugins/storage";
+
 const layoutContext = require.context("@/", false, /layout.(vue|(j|t)sx?)/);
 const DefaultLayout = defineComponent((_props, { slots }) => {
   return () => slots.default?.();

@@ -12,6 +12,10 @@ import { ExtRoute, PageRoutesConfig, PageConfig, PageState } from "./types";
 import appConfig from "@/app.config.json";
 import DefaultLayout from "./DefaultLayout";
 
+import { getStorage } from "../storage";
+
+const localXStorage = getStorage("local");
+
 /**
  * 创建 Vuex.Store 的 Module，其中，state 支持与 localStorage 同步
  * @param options vuex 模块配置
@@ -30,12 +34,16 @@ const createStore = (
         ) {
           return Reflect.get(target, _name);
         }
-        const _val = localStorage.getItem(`STORE:${name}/${String(_name)}`);
+        const _val = localXStorage.getItem(`STORE:${name}/${String(_name)}`);
         Reflect.set(target, _name, _val);
         return _val;
       },
       set: (target, _name, _val) => {
-        localStorage.setItem(`STORE:${name}/${String(_name)}`, _val);
+        localXStorage.setItem(
+          `STORE:${name}/${String(_name)}`,
+          _val,
+          7 * 24 * 3600 * 1000 // 存7天，7天后强制过期
+        );
         Reflect.set(target, _name, _val);
         return true;
       }
