@@ -12,48 +12,7 @@ import { ExtRoute, PageRoutesConfig, PageConfig, PageState } from "./types";
 import appConfig from "@/app.config.json";
 import DefaultLayout from "./DefaultLayout";
 
-import { getStorage } from "../storage";
-
-const localXStorage = getStorage("local");
-
-/**
- * 创建 Vuex.Store 的 Module，其中，state 支持与 localStorage 同步
- * @param options vuex 模块配置
- */
-const createStore = (
-  name: string,
-  options: Module<any, any>
-): Module<any, any> => {
-  if (options.state) {
-    options.state = new Proxy(options.state, {
-      get: (target, _name) => {
-        if (
-          _name === Symbol.toStringTag ||
-          String(_name).startsWith("__v_") ||
-          _name === "toJSON"
-        ) {
-          return Reflect.get(target, _name);
-        }
-        const _val = localXStorage.getItem(`STORE:${name}/${String(_name)}`);
-        Reflect.set(target, _name, _val);
-        return _val;
-      },
-      set: (target, _name, _val) => {
-        localXStorage.setItem(
-          `STORE:${name}/${String(_name)}`,
-          _val,
-          7 * 24 * 3600 * 1000 // 存7天，7天后强制过期
-        );
-        Reflect.set(target, _name, _val);
-        return true;
-      }
-    });
-  }
-  return {
-    namespaced: true,
-    ...options
-  };
-};
+import createModule from "../store/createModule";
 
 /**
  * 根据 views 结构创建路由配置
@@ -140,7 +99,7 @@ const resolveRoutes: () => Array<RouteRecordRaw> = () => {
           }, {} as Module<any, any>);
         })
         .then(c => {
-          const _module = createStore(r.name, c);
+          const _module = createModule(r.name, c);
           Store.registerModule(r.name, _module);
         });
     }
@@ -202,9 +161,11 @@ router.install = (app: App) => {
 };
 
 // 提供 meta 的泛型数据
-export const useRoute = <T extends object>() => {
+const useRoute = <T extends object>() => {
   const currentRoute = (_useRoute() as unknown) as ExtRoute<T>;
   return currentRoute;
 };
 
 export default router;
+
+export { useRoute };

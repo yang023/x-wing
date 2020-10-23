@@ -1,1 +1,1 @@
-export { default } from "./router";
+export { default, useRoute } from "./router";

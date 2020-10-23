@@ -7,3 +7,5 @@ const Storages = {
 const getStorage = (type: StorageType): XStorage => Storages[type];
 
 export { getStorage };
+
+export { disabledGlobalStorage } from "./helper";

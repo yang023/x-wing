@@ -3,13 +3,6 @@ const Storages = {
   session: sessionStorage
 };
 
-Object.defineProperty(window, "localStorage", {
-  get: () => null
-});
-Object.defineProperty(window, "sessionStorage", {
-  get: () => null
-});
-
 const getStorage = (type: StorageType) => {
   return Storages[type];
 };
@@ -58,4 +51,13 @@ const removeItem = (type: StorageType, ...keys: string[]) => {
   });
 };
 
-export { setItem, getItem, removeItem };
+const disabledGlobalStorage = (): void => {
+  Object.defineProperty(window, "localStorage", {
+    get: () => null
+  });
+  Object.defineProperty(window, "sessionStorage", {
+    get: () => null
+  });
+};
+
+export { setItem, getItem, removeItem, disabledGlobalStorage };

@@ -4,7 +4,7 @@ import { RouterView } from "vue-router";
 import router from "./plugins/router";
 import store from "./plugins/store";
 
-import "./plugins/storage";
+import { disabledGlobalStorage as _disabledGlobalStorage } from "./plugins/storage";
 
 const layoutContext = require.context("@/", false, /layout.(vue|(j|t)sx?)/);
 const DefaultLayout = defineComponent((_props, { slots }) => {
@@ -20,9 +20,14 @@ const starter = async (config?: {
   wrapper?: Component;
   plugins?: Plugin[];
   defaultLayout?: boolean;
+  disabledGlobalStorage?: boolean;
 }) => {
-  const { wrapper, plugins = [] as Plugin[], defaultLayout = false } =
-    config || {};
+  const {
+    wrapper,
+    plugins = [] as Plugin[],
+    defaultLayout = false,
+    disabledGlobalStorage = false
+  } = config || {};
   const CurrentLayout = defaultLayout ? DefaultLayout : ConfiguratedLayout;
   const Content = () => (
     <CurrentLayout>
@@ -45,7 +50,43 @@ const starter = async (config?: {
     _app.use(plugin);
   });
 
+  if (disabledGlobalStorage) {
+    _disabledGlobalStorage();
+  }
   return (ele: string | HTMLElement) => _app.mount(ele);
 };
 
 export default starter;
+
+export { getStorage } from "./plugins/storage";
+export { useRoute } from "./plugins/router";
+export {
+  useActions,
+  useGetters,
+  useMutations,
+  useRouteActions,
+  useRouteGetters,
+  useRouteMutations,
+  useRouteState,
+  useState
+} from "./plugins/store";
+
+export {
+  XForm,
+  setComponent,
+  createForm,
+  onEvent,
+  onFieldOptionChange,
+  onFieldStateChange,
+  onFieldValueChange,
+  onFormCreated,
+  onFormStateChange,
+  onFormValueChange
+} from "./plugins/form";
+export {
+  useHttpClient,
+  setClient,
+  setSuccessHandler,
+  setErrorHandler,
+  HttpClientHandler
+} from "./plugins/http-client";

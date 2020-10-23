@@ -1,6 +1,6 @@
 import { defineComponent } from "vue";
 
-import { createForm, onFormValueChange, XForm } from "@core/plugins/form";
+import { createForm, onFormValueChange, XForm } from "@core/app";
 
 type Data = {
   a: string | Date;
