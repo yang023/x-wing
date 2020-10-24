@@ -6,10 +6,7 @@ export type PageConfig<T extends object> = {
   state?: T;
 };
 
-export type PageState<T> = {
-  title: string;
-  state: T;
-};
+export type PageState<T> = Required<Pick<PageConfig<T>, "title" | "state">>;
 
 export type PageMetaConfig = {
   name: string;

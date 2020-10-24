@@ -3,20 +3,7 @@ import { get } from "./baseUrl";
 import urlWithPathValues from "./urlWithPathValues";
 import AbstractClient from "./AbstractHttpClient";
 import FetchClient from "./FetchHttpClient";
-
-type HttpService<I, P> = (
-  url: string,
-  method: "get" | "post" | "delete" | "put",
-  data?: I,
-  headers?: Headers
-) => Promise<P>;
-
-type HttpClientHandler<I, P> = (
-  baseUrl: BaseUrlGetter,
-  fetcher: HttpService<I, P>
-) => void;
-
-type BaseUrlGetter = (key: string, path: string, version?: string) => string;
+import { HttpClientHandler, HttpService } from "./index.d";
 
 type ClientType<I = any, P = any> = new () => AbstractClient<I, P>;
 
@@ -110,6 +97,6 @@ const useHttpClient = <I = any, P = any>(
   }, fetcher);
 };
 
-export { setClient, setSuccessHandler, setErrorHandler, HttpClientHandler };
+export { setClient, setSuccessHandler, setErrorHandler };
 
 export default useHttpClient;

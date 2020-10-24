@@ -1,5 +1,13 @@
-const a = {
-  a: 1
+type State = {
+  a: number;
+  b: string;
 };
 
-export default a;
+const state: State = {
+  a: 1,
+  b: "3"
+};
+
+export default state;
+
+export { State };

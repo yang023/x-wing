@@ -51,6 +51,18 @@ const removeItem = (type: StorageType, ...keys: string[]) => {
   });
 };
 
+/**
+ * 删除非 XStorage 管理的 Storage key
+ */
+const removeOthers = (type: StorageType) => {
+  const storage = getStorage(type);
+  Object.keys(storage).forEach(key => {
+    if (!key.startsWith(MainKey)) {
+      storage.removeItem(key);
+    }
+  });
+};
+
 const disabledGlobalStorage = (): void => {
   Object.defineProperty(window, "localStorage", {
     get: () => null
@@ -60,4 +72,4 @@ const disabledGlobalStorage = (): void => {
   });
 };
 
-export { setItem, getItem, removeItem, disabledGlobalStorage };
+export { removeOthers, setItem, getItem, removeItem, disabledGlobalStorage };

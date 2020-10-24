@@ -12,6 +12,7 @@ class XStorage implements StorageCore {
   constructor(type: StorageType) {
     this.type = type;
   }
+
   setItem<T>(key: string, value: T, timeout?: number): void {
     Storage.setItem<T>(this.type, key, value, timeout);
     this.$events.next({

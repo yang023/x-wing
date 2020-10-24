@@ -1,5 +1,41 @@
 import { useRoute } from "vue-router";
-import { useStore, GetterTree, CommitOptions, DispatchOptions } from "vuex";
+import {
+  useStore,
+  GetterTree,
+  CommitOptions,
+  DispatchOptions,
+  Store
+} from "vuex";
+
+// 对 mutations / actions 的 TS 提示
+type XActions<T = any, C = any, S = any, R = any> = {
+  [K in keyof T]: (
+    this: Store<S>,
+    injectee: {
+      dispatch: <_K extends keyof Omit<T, K>, P>(
+        type: _K,
+        payload?: Omit<T, K>[_K],
+        options?: DispatchOptions
+      ) => Promise<P>;
+      commit: <_K extends keyof C>(
+        type: _K | string,
+        payload?: C[_K],
+        options?: CommitOptions
+      ) => void;
+      state: S;
+      getters: any;
+      rootState: R;
+      rootGetters: any;
+    },
+    payload?: T[K]
+  ) => any;
+};
+
+type XMutations<T, S> = {
+  [K in keyof T]: (state: S, payload?: T[K]) => any;
+};
+
+export { XMutations, XActions };
 
 /**
  * 获取 Store 的 state，指定 name 获取对应 module 的 state
@@ -38,12 +74,18 @@ const useGetters = (name?: string) => {
  *
  * @param name 模块名
  */
-const useMutations = <P>(name?: string) => {
+const useMutations = <T>(name?: string) => {
   const store = useStore();
 
-  return (type: string, payload?: P, options?: CommitOptions) => {
-    const _key = name ? `${name}/${type}` : type;
-    store.commit(_key, payload, options);
+  return {
+    commit: <K extends keyof T>(
+      type: K,
+      payload?: T[K],
+      options?: CommitOptions
+    ) => {
+      const _type = name ? `${name}/${type}` : `${type}`;
+      return store.commit(_type, payload, options);
+    }
   };
 };
 
@@ -52,11 +94,18 @@ const useMutations = <P>(name?: string) => {
  *
  * @param name 模块名
  */
-const useActions = <P = any, R = any>(name?: string) => {
+const useActions = <T>(name?: string) => {
   const store = useStore();
-  return (type: string, payload?: P, options?: DispatchOptions): Promise<R> => {
-    const _key = name ? `${name}/${type}` : type;
-    return store.dispatch(_key, payload, options);
+
+  return {
+    dispatch: <K extends keyof T>(
+      type: K,
+      payload?: T[K],
+      options?: DispatchOptions
+    ) => {
+      const _type = name ? `${name}/${type}` : `${type}`;
+      return store.dispatch(_type, payload, options);
+    }
   };
 };
 
@@ -65,7 +114,7 @@ const useActions = <P = any, R = any>(name?: string) => {
  */
 const useRouteState = <T = any>() => {
   const { name } = useRoute();
-  return useState(name as string);
+  return useState<T>(name as string);
 };
 
 /**
@@ -79,7 +128,7 @@ const useRouteGetters = () => {
 /**
  * commit 当前 route 下的 mutation
  */
-const useRouteMutations = <P>() => {
+const useRouteMutations = <T = any>() => {
   const { name } = useRoute();
   return useMutations(name as string);
 };
@@ -87,9 +136,9 @@ const useRouteMutations = <P>() => {
 /**
  * dispatch 当前 route 下的 action
  */
-const useRouteActions = <P = any, R = any>() => {
+const useRouteActions = <T>() => {
   const { name } = useRoute();
-  return useActions(name as string);
+  return useActions<T>(name as string);
 };
 
 export {

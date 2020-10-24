@@ -95,11 +95,12 @@ const resolveRoutes: () => Array<RouteRecordRaw> = () => {
           return m.reduce((res, i) => {
             res[i.key as keyof Module<any, any>] = i.module;
 
-            return r;
+            return res;
           }, {} as Module<any, any>);
         })
         .then(c => {
           const _module = createModule(r.name, c);
+
           Store.registerModule(r.name, _module);
         });
     }

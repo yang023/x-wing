@@ -1,3 +1,4 @@
+import { App } from "vue";
 import XStorage from "./Storage";
 
 const Storages = {
@@ -8,4 +9,20 @@ const getStorage = (type: StorageType): XStorage => Storages[type];
 
 export { getStorage };
 
-export { disabledGlobalStorage } from "./helper";
+import { disabledGlobalStorage } from "./helper";
+
+const Plugin = {
+  install: (
+    app: App,
+    options?: {
+      disabledGlobal?: boolean;
+    }
+  ) => {
+    const { disabledGlobal = true } = options || {};
+    if (disabledGlobal) {
+      disabledGlobalStorage();
+    }
+  }
+};
+
+export default Plugin;

@@ -2,6 +2,5 @@ export {
   default as useHttpClient,
   setClient,
   setSuccessHandler,
-  setErrorHandler,
-  HttpClientHandler
+  setErrorHandler
 } from "@core/plugins/http-client/useHttpClient";
