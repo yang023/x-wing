@@ -1,4 +1,4 @@
-# x-wing
+ # x-wing
 基于 Vue (Composition API) + TypeScript 启动环境，对 vue-router 进行封装扩展，以及整合应用系统的相关配置
 
 ## 启动
@@ -14,15 +14,20 @@ yarn serve
 .
 \-- core 核心工具
     \-- app.tsx 应用启动器
+    \-- app.d.ts 类型文件
     \-- plugins 启动插件
         \-- router 扩展 vue-router，实现 0 配置单页面路由应用
+        \-- store 扩展 vuex 的工具库
         \-- form 表单驱动器
+        \-- http-client 异步请求工具
+        \-- storage 扩展/替换 localStorage 和 sessionStorage
 \-- src 应用源码
     \-- assets 资源文件
     \-- views 页面目录
     \-- main.ts 应用入口文件
     \-- shims-vue.d.ts 模块定义
     \-- app.config.json 应用相关配置
+    \-- store.ts vuex 的根配置
 
 ```
 
@@ -104,6 +109,164 @@ console.log(meta.a);
 
 #### 待实现：
 * 路由鉴权
+
+
+## 约定式状态管理
+
+基于 Vuex 4 实现，扩展配置、使用等 Api
+* 提供 ts 支持的工具类型
+* 与 VueRouter 强绑定，实现页面级别的状态管理
+* 状态持久化到 localStorage 中（扩展的 XStorage）
+
+> 根状态配置
+```
+src/store.ts // store.js or store.jsx or store.tsx
+const opotion = {
+  state: {},
+  mutations: {},
+  actions: {}
+  // ...
+}
+export default option;
+```
+在 src 目录下创建 store.ts （.tsx/.js/.jsx） 文件，并导出默认配置对象 (export default)，即完成 Vuex 根状态的配置
+
+> 路由的状态配置（modules）
+```
+\-- views
+    \-- index.ts
+    \-- store
+        \-- state.ts
+        \-- getters.ts
+        \-- actions.ts
+        \-- mutations.ts
+```
+在页面目录下创建 store 子目录，并分别创建 state、getters、actions、mutations 文件（.(j|t)sx?），导出默认配置对象，即完成 Vuex 的模块配置，自动加载到 Vuex.Store 对象中完成创建
+
+使用 useActions, useMutations, useState, useGetters，扩展 useStore
+```
+const state = useGetters();
+// ==> 
+const state = useStore().state;
+
+const getters = useGetters();
+// ==> 
+const getters = useStore().getters;
+
+// action: test
+const actions = useActions("index");
+actions.dispatch("test");
+// ==> 
+const store = useStore();
+store.dispatch("index/test");
+
+// nutation: test
+const mutations = useMutations("index");
+mutations.commit("test");
+// ==> 
+const store = useStore();
+store.commit("index/test");
+```
+
+** 也可直接使用 Vuex 的 API
+
+* 提供 actions、mutations 定义的 TS 工具类型，在 useActions, useMutations, useState, useGetters 中设置泛型参数即可获得 TS 类型提示
+```
+type XActions<T = any, C = any, S = any, R = any> = {
+  [K in keyof T]: (
+    this: Store<S>,
+    injectee: {
+      dispatch: <_K extends keyof Omit<T, K>, P>(
+        type: _K,
+        payload?: Omit<T, K>[_K],
+        options?: DispatchOptions
+      ) => Promise<P>;
+      commit: <_K extends keyof C>(
+        type: _K | string,
+        payload?: C[_K],
+        options?: CommitOptions
+      ) => void;
+      state: S;
+      getters: any;
+      rootState: R;
+      rootGetters: any;
+    },
+    payload?: T[K]
+  ) => any;
+};
+
+type XMutations<T, S> = {
+  [K in keyof T]: (state: S, payload?: T[K]) => any;
+};
+```
+
+使用 XActions
+```
+// ./store/actions.ts
+import { State } from "./state";
+import { IndexMutation } from "./mutations";
+import { XActions } from "@core/app.d";
+
+type IndexActions = {
+  ACTION_A: number;
+  ACTION_B: string;
+};
+
+const actions: XActions<IndexActions, IndexMutation, State> = {
+  ACTION_A: ({ commit }, payload = 0) => {
+    commit("TEST_A", payload);
+  },
+  ACTION_B: ({ commit }, payload = "") => {
+    commit("TEST_B", payload);
+  }
+};
+
+export default actions;
+
+export { IndexActions };
+
+// index.ts
+
+import { useActions } from "@core/app";
+import { IndexAction } from "./store/actions.ts";
+
+const actions = useActions<IndexAction>("index");
+actions.dispatch("ACTION_A", 1);
+```
+
+使用 XMutations
+```
+// ./store/mutations.ts
+import { State } from "./state";
+import { XMutations } from "@core/app.d";
+
+type IndexMutation = {
+  TEST_A: number;
+  TEST_B: string;
+};
+
+const mutations: XMutations<IndexMutation, State> = {
+  TEST_A: (state, payload = 0) => {
+    state.a = payload;
+  },
+  TEST_B: (state, payload = "") => {
+    state.b = payload;
+  }
+};
+
+export default mutations;
+
+export { IndexMutation };
+
+// index.ts
+
+import { useMutations } from "@core/app";
+import { IndexMutations } from "./store/actions.ts";
+
+const mutations = useMutations<IndexMutations>("index");
+mutations.commit("TEST_A", 1);
+```
+
 
 ## 表单驱动器
 统一管理收集用户输入，并校验输入结果的组件集合
@@ -389,7 +552,6 @@ export default class AxiosHttpClient<I, P> extends AbstractClient<I, P> {
   }
 }
 
-
 // use
 import AxiosHttpClient from "@/AxiosHttpClient";
 import { setClient } from "@core/plugins/http-client"
@@ -420,6 +582,45 @@ useHttpClient((baseUrl, service) => {
     console.log(err)
   }
 })
+```
+
+
+## 扩展的 Storage
+
+> 增强/替换 localStorage 和 sessionStorage
+
+基于前端数据的缓存、存储机制的特点和存在问题，localStorage, sessionStorage 相对兼容大部分情况，因此选择 localStorage 和 sessionStorage 构建解决以下问题的 Storage 机制：
+
+* 对非 string 类型的数据存储支持不友好，大部分情况下，要存储 array, obejct 等类型的数据，需要使用 JSON.stringify 转换数据为 string 类型后再储存；获取时也需要调用 JSON.parse 等方法还原对象，产生需对无用，重复的代码
+
+* localStorage 本身为永久存储机制，但大部分数据有一定的使用期限，在有效期中的数据才生效，但又非 sessionStorage 的 “会话” 级别的有效期，浏览器关闭后也需要保留该有效期内的数据供下次浏览器打开时使用
+
+Storage 的扩展点
+
+* 支持 string, number, boolean, object, array 类型的数据结构的存储
+
+* 支持有效期机制（ms）
+
+* 调用方式与原生 localStorage 和 sessionStorage 基本一致，并提供泛型支持
+
+使用
+
+```
+import { useStorage } from "@core/app";
+
+const storage = useStorage("local"); // or "session";
+
+const value = {
+  a: 1
+};
+// "key" 指向的数据在 2小时 内有效
+storage.setItem("key", value, 7200 * 1000);
+
+// getItem 函数支持泛型
+// 若 "key" 已过期，返回 null 
+const _value = storage.getItem<{
+  a: number
+}>("key");
 ```
 
 
