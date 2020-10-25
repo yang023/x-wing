@@ -1,8 +1,8 @@
 import { Module } from "vuex";
 
-import { getStorage } from "../storage";
+import { useStorage } from "../storage";
 
-const localXStorage = getStorage("local");
+const localXStorage = useStorage("local");
 
 /**
  * 创建 Vuex.Store 的 Module，其中，state 支持与 localStorage 同步

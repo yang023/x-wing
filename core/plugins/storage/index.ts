@@ -5,15 +5,15 @@ const Storages = {
   local: new XStorage("local"),
   session: new XStorage("session")
 };
-const getStorage = (type: StorageType): XStorage => Storages[type];
+const useStorage = (type: StorageType): XStorage => Storages[type];
 
-export { getStorage };
+export { useStorage };
 
 import { disabledGlobalStorage } from "./helper";
 
 const Plugin = {
   install: (
-    app: App,
+    _app: App,
     options?: {
       disabledGlobal?: boolean;
     }

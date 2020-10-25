@@ -6,7 +6,7 @@ import store from "./plugins/store";
 
 import storage from "./plugins/storage";
 
-export { getStorage } from "./plugins/storage";
+export { useStorage } from "./plugins/storage";
 export { useRoute } from "./plugins/router";
 export {
   useActions,
