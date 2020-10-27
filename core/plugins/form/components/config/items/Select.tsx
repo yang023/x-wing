@@ -1,7 +1,12 @@
 import { FieldCore } from "../../../types";
-import { computed, defineComponent, OptionHTMLAttributes, PropType } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import useValue from "./useValue";
 import { useField } from "../../XField";
+
+import AntSelect from "ant-design-vue/lib/select";
+import "ant-design-vue/lib/select/style";
+AntSelect.name = "Select";
+AntSelect.Option.name = "SelectOption";
 
 const Select = defineComponent({
   props: {
@@ -11,21 +16,25 @@ const Select = defineComponent({
     }
   },
   setup(props) {
-    const [value] = useValue(props.field);
+    const [value, setValue] = useValue(props.field);
 
     const field = useField(props.field);
     const options = computed(() => field.option.value.eumns || []);
 
     return () => (
-      <select v-model={value.value}>
-        {options.value.map(item => {
-          return (
-            <option value={item.value as OptionHTMLAttributes["value"]}>
-              {item.title}
-            </option>
-          );
-        })}
-      </select>
+      <AntSelect
+        name={name}
+        value={value.value}
+        options={options.value.map(item => ({
+          ...item,
+          label: item.title,
+          value: `${item.value}`,
+          key: `${item.value}`
+        }))}
+        onSelect={(e: any) => {
+          setValue(e);
+        }}
+      ></AntSelect>
     );
   }
 });

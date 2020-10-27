@@ -1,8 +1,12 @@
-import { computed, defineComponent, PropType } from "vue";
+import { defineComponent, PropType } from "vue";
 import { FieldCore } from "../../types";
 import { useField } from "../XField";
 
-import style from "./items/styles.module.less";
+import AntForm from "ant-design-vue/lib/form";
+import "ant-design-vue/lib/form/style";
+
+AntForm.name = "Form";
+AntForm.Item.name = "FormItem";
 
 const DefaultFieldLayout = defineComponent({
   props: {
@@ -13,27 +17,17 @@ const DefaultFieldLayout = defineComponent({
   },
   setup(props, { slots }) {
     const field = useField(props.field);
-    const wrapperClass = computed(() => {
-      const classes: string[] = [style.defaultFormItem];
-      if (field.state.value.error) {
-        classes.push(style.defaultFormItemWithError);
-      }
-      return classes;
-    });
 
     return () => (
-      <div class={wrapperClass.value}>
-        <div class={style.defaultFormItemInner}>
-          <div class={style.defaultFormItemLabel}>
-            {field.option.value.label}
-          </div>
-          <div class={style.defaultFormItemContent}>{slots.default?.()}</div>
-          <div class={style.defaultFormItemTips}>{field.option.value.tips}</div>
-        </div>
-        <div class={style.defaultFormItemError}>
-          {field.option.value.errors}
-        </div>
-      </div>
+      <AntForm.Item
+        name={field.name}
+        label={field.option.value.label}
+        validateStatus={field.state.value.error ? "error" : ""}
+        help={field.option.value.errors}
+        extra={field.option.value.tips}
+      >
+        {slots.default?.()}
+      </AntForm.Item>
     );
   }
 });

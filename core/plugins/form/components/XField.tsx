@@ -43,7 +43,7 @@ const useField = (field: FieldCore) => {
     });
   });
 
-  return { state, option };
+  return { name, state, option };
 };
 
 export { useField };

@@ -3,14 +3,15 @@ import { FieldCore } from "../../../types";
 import Select from "./Select";
 import Checkbox from "./Checkbox";
 import Radio from "./Radio";
-import RenderInput from "./RenderInput";
+import Input from "./Input";
+import DatePicker from "./DatePicker";
+import TimePicker from "./TimePicker";
 
 type ComponentTypes =
   | "Input"
   | "Password"
   | "Date"
   | "Time"
-  | "Datetime"
   | "Checkbox"
   | "Radio"
   | "Select";
@@ -24,11 +25,10 @@ type Component = DefineComponent<{
 const Components: {
   [key in ComponentTypes]: Component;
 } = {
-  Input: RenderInput("text"),
-  Password: RenderInput("password"),
-  Date: RenderInput("date"),
-  Time: RenderInput("time"),
-  Datetime: RenderInput("datetime-local"),
+  Input: Input,
+  Password: Input,
+  Date: DatePicker,
+  Time: TimePicker,
   Checkbox: Checkbox,
   Radio: Radio,
   Select: Select

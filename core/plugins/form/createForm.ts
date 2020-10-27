@@ -16,8 +16,10 @@ import {
   ReadonlyFieldState,
   FormState,
   FieldState,
-  FormCore
+  FormCore,
+  FieldType
 } from "./types";
+import toMoment from "./components/config/items/toMoment";
 
 type EventType<T = any> = {
   event: string;
@@ -109,9 +111,9 @@ const onFormStateChange = <T extends FormState>(
  * @param key 字段匹配符
  * @param handler 字段值变更后回调
  */
-const onFieldValueChange = <T = any>(
+const onFieldValueChange = <T = any, L = any>(
   key: string,
-  handler: (payload: { name: string; value: T }) => void
+  handler: (payload: { name: string; value: T; link?: L }) => void
 ) => {
   onEvent(FieldEvents.valueChange(key), handler);
 };
@@ -209,8 +211,8 @@ const createForm = <T = any>(config: FormProps) => {
       return resolve => {
         return _setData.call(target, loader => {
           resolve.call(target, data => {
-            emitFormEvent(FormEvents.valueChange(), data);
             loader.call(target, data);
+            emitFormEvent(FormEvents.valueChange(), target.data);
           });
         });
       };
@@ -227,6 +229,9 @@ const createForm = <T = any>(config: FormProps) => {
     emitFormEvent(FormEvents.valueChange(), _form.data);
   });
 
+  const isDatetime = (type: FieldType) =>
+    ["datetime", "date", "time"].includes(type);
+
   fields.forEach(props => {
     const $fieldState = createState<ReadonlyFieldState, ChangeableFieldState>(
       { changing: false, error: false },
@@ -234,13 +239,25 @@ const createForm = <T = any>(config: FormProps) => {
       props.name
     );
 
+    const { type = "input" } = props;
+    if (isDatetime(type)) {
+      props.defaultValue && (props.defaultValue = toMoment(props.defaultValue));
+    }
+
     const field = new Field(props, $fieldState);
     const _field = createProxy(field, {
       setValue: (_setValue, target) => {
         return value => {
+          if (isDatetime(type)) {
+            if (value) {
+              value = toMoment(value);
+            }
+          }
+
           emitFieldEvent(FieldEvents.valueChange(target.name), {
             name: field.name,
-            value: value
+            value: value,
+            link: target.link ? form.data[target.link as keyof T] : undefined
           });
           target.clearValidation();
 

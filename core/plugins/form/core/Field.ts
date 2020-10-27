@@ -18,6 +18,7 @@ class Field implements FieldCore {
   readonly display: Required<FieldDisplay>;
   readonly valueFormat: string;
   readonly sourceFormat: string;
+  readonly link?: string;
   value: any;
   initialValue: any;
 
@@ -30,12 +31,15 @@ class Field implements FieldCore {
     this.rules = props.rules as RuleItem | RuleItem[];
     this.valueFormat = props.valueFormat || props.name;
     this.sourceFormat = props.sourceFormat || props.name;
+    this.link = props.link;
 
     this.display = {
       label: props.label || "",
       eumns: props.eumns || [],
       tips: props.tips || "",
-      errors: ""
+      errors: "",
+      disabledDate: () => false,
+      disabledTime: () => false
     };
 
     const _value = props.defaultValue;

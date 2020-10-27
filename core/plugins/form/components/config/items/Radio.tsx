@@ -1,7 +1,12 @@
 import { FieldCore } from "../../../types";
-import { computed, defineComponent, InputHTMLAttributes, PropType } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import useValue from "./useValue";
 import { useField } from "../../XField";
+
+import AntRadio from "ant-design-vue/lib/radio";
+import "ant-design-vue/lib/radio/style";
+AntRadio.name = "Radio";
+AntRadio.Group.name = "RadioGroup";
 
 const Radio = defineComponent({
   props: {
@@ -11,29 +16,24 @@ const Radio = defineComponent({
     }
   },
   setup(props) {
-    const [value] = useValue(props.field);
+    const [value, setValue] = useValue(props.field);
 
     const field = useField(props.field);
     const options = computed(() => field.option.value.eumns || []);
 
     return () => (
-      <>
-        {options.value.map(item => {
-          const id = `$checkbox_${item.value}`;
-          return (
-            <label for={id}>
-              <input
-                id={id}
-                type="radio"
-                name={name}
-                v-model={value.value}
-                value={item.value as InputHTMLAttributes["value"]}
-              ></input>
-              {item.title}
-            </label>
-          );
-        })}
-      </>
+      <AntRadio.Group
+        name={name}
+        value={value.value}
+        options={options.value.map(item => ({
+          ...item,
+          label: item.title,
+          value: `${item.value}`
+        }))}
+        onChange={(e: Event) => {
+          setValue((e.target as HTMLInputElement).value);
+        }}
+      ></AntRadio.Group>
     );
   }
 });

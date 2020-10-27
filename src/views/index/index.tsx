@@ -1,15 +1,6 @@
 import { defineComponent } from "vue";
 
-import {
-  createForm,
-  onFormValueChange,
-  XForm,
-  useState,
-  useActions
-} from "@core/app";
-
-import { State } from "./store/state";
-import { IndexActions } from "./store/actions";
+import { createForm, onFieldValueChange, XForm } from "@core/app";
 
 type Data = {
   a: string | Date;
@@ -18,60 +9,50 @@ type Data = {
 };
 
 export default defineComponent(() => {
-  const state = useState<State>("index");
-
-  const actions = useActions<IndexActions>("index");
-  setTimeout(() => {
-    actions.dispatch("ACTION_A", 1);
-  }, 1000);
-
-  const { form } = createForm<Data>({
+  const { form, actions } = createForm<Data>({
     id: "1",
     fields: [
       {
-        name: "a",
-        label: "A",
-        type: "datetime",
-        tips: "123",
-        defaultValue: new Date(),
-        rules: { required: true, message: "错误" }
+        name: "startDate",
+        label: "Start Date",
+        type: "date",
+        link: "startDate"
       },
       {
-        name: "b",
-        type: "checkbox",
-        eumns: [
-          { title: "A", value: "a" },
-          { title: "B", value: "b" },
-          { title: "C", value: "c" }
-        ],
-        label: "B",
-        defaultValue: [],
-        sourceFormat: "[b1,b2]",
-        valueFormat: "{0:b1,1:b2}",
-        rules: { required: true, message: "错误" }
+        name: "endDate",
+        label: "End Date",
+        type: "date",
+        link: "startDate"
       }
     ]
   });
 
   form.create();
 
-  form.setData(resolve => {
-    setTimeout(() => {
-      resolve({
-        a: new Date("2020-10-01 01:01"),
-        b1: "a",
-        b2: "b"
+  // 通过两个 date field 的相互联动 实现范围选择
+  onFieldValueChange<moment.Moment>("startDate", ({ value }) => {
+    actions.fieldOption("endDate", {
+      disabledDate: now => {
+        return now.unix() < value.unix();
+      }
+    });
+  });
+  onFieldValueChange<moment.Moment, moment.Moment>(
+    "endDate",
+    ({ value, link }) => {
+      if (link && link.unix() > value.unix()) {
+        actions.fieldValue("startDate", null);
+      }
+      actions.fieldOption("startDate", {
+        disabledDate: now => {
+          return now.unix() > value.unix();
+        }
       });
-    }, 1000);
-  });
-
-  onFormValueChange<Data>(val => {
-    console.log(val);
-  });
+    }
+  );
 
   return () => (
     <div style="width: 500px;margin:10px auto">
-      <div>{JSON.stringify(state)}</div>
       <XForm form={form}></XForm>
       <button
         onClick={() => {

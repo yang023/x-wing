@@ -273,7 +273,7 @@ mutations.commit("TEST_A", 1);
 
 > 借鉴 [formily](https://formilyjs.org/)，实现非嵌套结构的表单统一化组件，简化表单的数据收集、UI布局等繁琐操作，实现表单页面的快速开发
 
-为支持接入不同的 UI 框架，表单驱动器仅包含对表单数据、表单字段的管理，以及维护原生的输入组件
+为支持接入不同的 UI 框架，表单驱动器仅包含对表单数据、表单字段的管理，以及维护的输入组件
 目前支持的输入组件：
 * Input
 * Select
@@ -282,6 +282,8 @@ mutations.commit("TEST_A", 1);
 * Date
 * Time
 * Datetime
+
+默认的组件UI：[ant-design-vue](https://2x.antdv.com/docs/vue/introduce-cn/)
 
 ### 创建表单
 ```

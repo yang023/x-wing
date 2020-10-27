@@ -1,7 +1,12 @@
 import { FieldCore } from "../../../types";
-import { computed, defineComponent, InputHTMLAttributes, PropType } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import useValue from "./useValue";
 import { useField } from "../../XField";
+
+import AntCheckbox from "ant-design-vue/lib/checkbox";
+import "ant-design-vue/lib/checkbox/style";
+AntCheckbox.name = "Checkbox";
+AntCheckbox.Group.name = "CheckboxGroup";
 
 const Checkbox = defineComponent({
   props: {
@@ -11,32 +16,24 @@ const Checkbox = defineComponent({
     }
   },
   setup(props) {
-    const [value, setValue] = useValue(props.field, []);
+    const [value, setValue] = useValue(props.field);
 
     const field = useField(props.field);
     const options = computed(() => field.option.value.eumns || []);
 
     return () => (
-      <>
-        {options.value.map(item => {
-          const id = `$checkbox_${item.value}`;
-          return (
-            <label for={id}>
-              <input
-                id={id}
-                type="checkbox"
-                name={name}
-                v-model={value.value}
-                value={item.value as InputHTMLAttributes["value"]}
-                onChange={() => {
-                  setValue(value.value);
-                }}
-              ></input>
-              {item.title}
-            </label>
-          );
-        })}
-      </>
+      <AntCheckbox.Group
+        name={name}
+        value={value.value}
+        options={options.value.map(item => ({
+          ...item,
+          label: item.title,
+          value: `${item.value}`
+        }))}
+        onChange={(_val: any[]) => {
+          setValue(_val);
+        }}
+      ></AntCheckbox.Group>
     );
   }
 });

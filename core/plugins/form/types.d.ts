@@ -25,11 +25,14 @@ export type DefaultFieldProps = {
   defaultValue: any;
   valueFormat: string; // it's name is the default
   sourceFormat: string; // it's name is the default
+  link: string; // link to the other field in form
 };
 export type DisplayFieldProps = {
   label: string;
   tips: string;
   eumns: FieldEumnItem[];
+  disabledDate: (current: moment.Moment) => boolean;
+  disabledTime: (current: moment.Moment) => boolean;
 };
 
 export type FieldProps = Required<RequiredFieldProps> &
@@ -77,8 +80,7 @@ export type FieldType =
   | "radio"
   | "checkbox"
   | "date"
-  | "time"
-  | "datetime";
+  | "time";
 
 export type ReadonlyFieldState = {
   changing: boolean;
@@ -99,6 +101,7 @@ export interface FieldCore {
   readonly rules: RuleItem | RuleItem[];
   valueFormat: string;
   sourceFormat: string;
+  link?: string;
   value: any;
   initialValue?: any;
 
@@ -134,6 +137,8 @@ export type FieldDisplay = {
   tips: string;
   errors: string;
   eumns: FieldEumnItem[];
+  disabledDate: (current: moment.Moment) => boolean;
+  disabledTime: (current: moment.Moment) => boolean;
 };
 
 // 表单类型
