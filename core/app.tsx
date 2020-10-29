@@ -20,16 +20,23 @@ export {
 } from "./plugins/store";
 
 export {
+  // 表单组件
   XForm,
+  // 自定义表单项 UI 组件设置
   setComponent,
+  // 核心函数，表单驱动器创建函数
   createForm,
+  // 事件监听
   onEvent,
   onFieldOptionChange,
   onFieldStateChange,
   onFieldValueChange,
-  onFormCreated,
   onFormStateChange,
-  onFormValueChange
+  onFormValueChange,
+  // 工具
+  toMoment,
+  Transfers,
+  setTransfer
 } from "./plugins/form";
 export {
   useHttpClient,

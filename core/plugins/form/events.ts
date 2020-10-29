@@ -14,7 +14,6 @@ import { FieldCore, FieldDisplay, FieldState, FormState } from "./types";
  * EVENT_TYPE：控件相关的事件类型，如 input 的 onInput, onBlur, onFocus 等, 去掉 on 后的小写名称：input, blue, focus 等
  */
 const FormEvents = {
-  created: () => "form.created",
   submit: () => "form.submit",
   valueChange: () => "form.value.change",
   stateChange: <T = FormState>(key: keyof T | "*") => `form.state.${key}.change`

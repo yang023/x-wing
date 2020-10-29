@@ -16,18 +16,13 @@ import {
   ReadonlyFieldState,
   FormState,
   FieldState,
-  FormCore,
-  FieldType
+  FormCore
 } from "./types";
-import toMoment from "./components/config/items/toMoment";
+import { Transfers } from "./transfer";
 
 type EventType<T = any> = {
   event: string;
   payload: T;
-};
-
-type FormCoreExtension<T> = FormCore<T> & {
-  create: () => void;
 };
 
 const events = new Subject<EventType>();
@@ -38,7 +33,7 @@ const events = new Subject<EventType>();
  * @param handler 事件回调
  */
 const onEvent = <T>(key: string | RegExp, handler: (payload: T) => void) => {
-  events.subscribe(({ event, payload }) => {
+  const stop = events.subscribe(({ event, payload }) => {
     let matched = false;
     if (key instanceof RegExp) {
       matched = key.test(event);
@@ -52,6 +47,7 @@ const onEvent = <T>(key: string | RegExp, handler: (payload: T) => void) => {
       handler(payload);
     }
   });
+  return () => stop.unsubscribe();
 };
 
 /**
@@ -85,14 +81,7 @@ const emitFieldEvent = (key: string, payload: any) => {
  * @param handler 表单值修改后回调
  */
 const onFormValueChange = <T>(handler: (payload: FormData<T>) => void) => {
-  onEvent(FormEvents.valueChange(), handler);
-};
-/**
- * 表单创建事件监听器
- * @param handler 表单创建完成后回调
- */
-const onFormCreated = <T>(handler: (payload: T) => void) => {
-  onEvent(FormEvents.created(), handler);
+  return onEvent(FormEvents.valueChange(), handler);
 };
 /**
  * 表单状态变更事件监听器
@@ -103,7 +92,7 @@ const onFormStateChange = <T extends FormState>(
   state: keyof T | "*",
   handler: (payload: { name: string; state: T[keyof T] }) => void
 ) => {
-  onEvent(FormEvents.stateChange(state), handler);
+  return onEvent(FormEvents.stateChange(state), handler);
 };
 
 /**
@@ -113,9 +102,9 @@ const onFormStateChange = <T extends FormState>(
  */
 const onFieldValueChange = <T = any, L = any>(
   key: string,
-  handler: (payload: { name: string; value: T; link?: L }) => void
+  handler: (payload: { name: string; value?: T; link?: L }) => void
 ) => {
-  onEvent(FieldEvents.valueChange(key), handler);
+  return onEvent(FieldEvents.valueChange(key), handler);
 };
 /**
  * 字段状态变更事件监听器
@@ -128,7 +117,7 @@ const onFieldStateChange = <T extends FieldState>(
   state: keyof T | "*",
   handler: (payload: { name: string; state: T[keyof T] }) => void
 ) => {
-  onEvent(FieldEvents.stateChange(key, state), handler);
+  return onEvent(FieldEvents.stateChange(key, state), handler);
 };
 /**
  * 字段控件选项变更事件监听器
@@ -141,7 +130,7 @@ const onFieldOptionChange = <T extends FieldDisplay>(
   type: keyof T | "*",
   handler: (payload: { name: string; option: Partial<T> }) => void
 ) => {
-  onEvent(FieldEvents.optionChange(key, type), handler);
+  return onEvent(FieldEvents.optionChange(key, type), handler);
 };
 
 /**
@@ -194,13 +183,7 @@ const createForm = <T = any>(config: FormProps) => {
   );
   const _form = new Form(id, $formState);
 
-  const create = () => {
-    emitFormEvent(FormEvents.created(), _form);
-  };
-
-  Reflect.set(_form, "create", create);
-
-  const form = createProxy((_form as unknown) as FormCoreExtension<T>, {
+  const form = createProxy((_form as unknown) as FormCore<T>, {
     addField: (_addField, target) => {
       return field => {
         emitFieldEvent(FieldEvents.registered(field), field);
@@ -229,9 +212,6 @@ const createForm = <T = any>(config: FormProps) => {
     emitFormEvent(FormEvents.valueChange(), _form.data);
   });
 
-  const isDatetime = (type: FieldType) =>
-    ["datetime", "date", "time"].includes(type);
-
   fields.forEach(props => {
     const $fieldState = createState<ReadonlyFieldState, ChangeableFieldState>(
       { changing: false, error: false },
@@ -239,29 +219,29 @@ const createForm = <T = any>(config: FormProps) => {
       props.name
     );
 
-    const { type = "input" } = props;
-    if (isDatetime(type)) {
-      props.defaultValue && (props.defaultValue = toMoment(props.defaultValue));
+    props.type = props.type || "input";
+    // 通过 Transfer 工具对入参进行转换
+    if (props.defaultValue !== null || props.defaultValue !== undefined) {
+      props.defaultValue = Transfers[props.type](props.defaultValue);
     }
 
     const field = new Field(props, $fieldState);
+    // 若存在默认值, 对表单数据进行设置
+    if (field.value !== null || field.value !== undefined) {
+      Path.setIn(form.data, field.valueFormat, field.value);
+    }
     const _field = createProxy(field, {
       setValue: (_setValue, target) => {
         return value => {
-          if (isDatetime(type)) {
-            if (value) {
-              value = toMoment(value);
-            }
-          }
-
+          const _value = Transfers[target.type](value);
           emitFieldEvent(FieldEvents.valueChange(target.name), {
             name: field.name,
-            value: value,
+            value: _value,
             link: target.link ? form.data[target.link as keyof T] : undefined
           });
           target.clearValidation();
 
-          return _setValue.call(target, value);
+          return _setValue.call(target, _value);
         };
       },
       resetValue: (_setInitialValue, target) => {
@@ -359,19 +339,25 @@ const createForm = <T = any>(config: FormProps) => {
     form.getFields(key).forEach(field => field.setValue(value));
   };
 
+  // config.created?.(_form);
+
+  const actions = {
+    formInitialize,
+    formData,
+    formReset,
+    formClear,
+    formState,
+    fieldState,
+    fieldOption,
+    fieldValue
+  };
+
   return {
     form,
-    create,
-    actions: {
-      formInitialize,
-      formData,
-      formReset,
-      formClear,
-      formState,
-      fieldState,
-      fieldOption,
-      fieldValue
-    }
+    created: (handler: (_form: FormCore<T>) => void) => {
+      handler(_form);
+    },
+    actions
   };
 };
 
@@ -380,7 +366,6 @@ export {
   emitFormEvent,
   emitFieldEvent,
   onEvent,
-  onFormCreated,
   onFormValueChange,
   onFormStateChange,
   onFieldValueChange,
