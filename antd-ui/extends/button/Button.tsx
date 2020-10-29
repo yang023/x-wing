@@ -14,7 +14,7 @@ const Button = defineComponent({
     },
     onClick: {
       type: Function,
-      required: false
+      default: null
     }
   },
   setup(props, { slots }) {
