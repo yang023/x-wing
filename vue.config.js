@@ -11,6 +11,7 @@ module.exports = {
   chainWebpack: config => {
     config.resolve.alias.set("@common", resolvePath("common"));
     config.resolve.alias.set("@core", resolvePath("core"));
+    config.resolve.alias.set("@antd-ui", resolvePath("antd-ui"));
 
     config
       .plugin("moment")

@@ -34,9 +34,13 @@ export {
   onFormStateChange,
   onFormValueChange,
   // 工具
+  useForm,
+  useField,
+  useValue,
   toMoment,
   Transfers,
-  setTransfer
+  setTransfer,
+  FormConfig
 } from "./plugins/form";
 export {
   useHttpClient,

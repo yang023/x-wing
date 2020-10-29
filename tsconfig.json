@@ -18,7 +18,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@common/*": ["common/*"],
-      "@core/*": ["core/*"]
+      "@core/*": ["core/*"],
+      "@antd-ui/*": ["antd-ui/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
@@ -31,7 +32,11 @@
     "common/**/*.vue",
     "core/**/*.ts",
     "core/**/*.tsx",
-    "core/**/*.vue", "src/main.tss", "layout.ts"
+    "core/**/*.vue",
+    "antd-ui/**/*.ts",
+    "antd-ui/**/*.tsx",
+    "antd-ui/**/*.js",
+    "antd-ui/**/*.jsx"
   ],
   "exclude": ["node_modules"]
 }
