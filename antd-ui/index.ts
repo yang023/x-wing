@@ -1,2 +1,3 @@
-import "./extends";
+export * from "./extends";
+
 import "./form-items";
