@@ -23,20 +23,6 @@
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "common/**/*.ts",
-    "common/**/*.tsx",
-    "common/**/*.vue",
-    "core/**/*.ts",
-    "core/**/*.tsx",
-    "core/**/*.vue",
-    "antd-ui/**/*.ts",
-    "antd-ui/**/*.tsx",
-    "antd-ui/**/*.js",
-    "antd-ui/**/*.jsx"
-  ],
+  "include": ["core", "common", "antd-ui", "src"],
   "exclude": ["node_modules"]
 }

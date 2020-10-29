@@ -1,7 +1,7 @@
 import { defineComponent } from "vue";
 
 import { createForm, onFieldValueChange, toMoment, XForm } from "@core/app";
-import { XAsnycButton, XButton } from "@antd-ui/extends";
+import { XAsnycButton, XButton } from "@antd-ui/index";
 
 type Data = {
   startDate: string | Date | moment.Moment;

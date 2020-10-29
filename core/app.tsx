@@ -53,6 +53,7 @@ const layoutContext = require.context("@/", false, /layout.(vue|(j|t)sx?)/);
 const DefaultLayout = defineComponent((_props, { slots }) => {
   return () => slots.default?.();
 });
+
 const ConfiguratedLayout =
   layoutContext.keys().length === 1
     ? layoutContext(layoutContext.keys()[0]).default
@@ -72,6 +73,7 @@ const starter = async (config?: {
     disabledGlobalStorage = false
   } = config || {};
   const CurrentLayout = defaultLayout ? DefaultLayout : ConfiguratedLayout;
+
   const Content = () => (
     <CurrentLayout>
       <RouterView></RouterView>
