@@ -1,9 +1,9 @@
 import { defineComponent, shallowRef, PropType, ref } from "vue";
-import { onFieldOptionChange, onFieldStateChange } from "../createForm";
-import { FieldCore, FieldType } from "../types";
+import { onFieldOptionChange, onFieldStateChange } from "@core/plugins/form";
+import { FieldCore, FieldType } from "@core/plugins/form/types";
 
 import { FormConfig } from "./config";
-import { Components, ComponentTypes } from "./config/items";
+import { ComponentTypes, Components } from "./setting";
 
 const getComponentType = (type: FieldType): ComponentTypes => {
   return type.replace(/^\w{1,1}/, r => r.toUpperCase()) as ComponentTypes;

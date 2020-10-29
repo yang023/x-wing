@@ -1,6 +1,6 @@
 import { FieldType } from "./types";
 import { isArray } from "./utils";
-import toMoment from "./components/config/items/toMoment";
+import toMoment from "./components/toMoment";
 
 type TransferType<T = any, R = any> = (value: T) => R;
 

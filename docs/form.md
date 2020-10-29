@@ -20,7 +20,7 @@
 ```
 import { defineComponent } from "vue";
 
-import { createForm, XForm } from "@core/plugins/form";
+import { createForm, XForm } from "@core/app";
 
 type Data = {
   a: string;
