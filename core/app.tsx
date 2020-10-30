@@ -56,7 +56,7 @@ const DefaultLayout = defineComponent((_props, { slots }) => {
 
 const ConfiguratedLayout =
   layoutContext.keys().length === 1
-    ? layoutContext(layoutContext.keys()[0]).default
+    ? layoutContext(layoutContext.keys()[0]).default || DefaultLayout
     : DefaultLayout;
 
 const starter = async (config?: {

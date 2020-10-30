@@ -71,7 +71,7 @@ export default defineComponent(() => {
   );
 
   return () => (
-    <div style="width: 500px;margin:10px auto">
+    <div style="width: 500px;margin:10px auto;">
       <XForm form={form}></XForm>
       <XAsnycButton
         type="primary"

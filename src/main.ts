@@ -5,8 +5,6 @@ import "./app.less";
 
 import "@antd-ui";
 
-starter({
-  defaultLayout: true
-}).then(start => {
+starter().then(start => {
   start("#app");
 });

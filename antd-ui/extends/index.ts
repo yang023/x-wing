@@ -8,3 +8,6 @@ export { XCheckbox, XCheckboxGroup } from "./Checkbox";
 export { XRadio, XRadioGroup } from "./Radio";
 export { XTimePicker } from "./TimePicker";
 export { XDatePicker } from "./DatePicker";
+
+// others
+export { XDrawer } from "./Drawer";

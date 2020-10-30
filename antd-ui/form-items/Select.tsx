@@ -25,7 +25,6 @@ const Select = defineComponent({
         options={options.value.map(item => ({
           ...item,
           label: item.title,
-          value: `${item.value}`,
           key: `${item.value}`
         }))}
         onSelect={(e: any) => {
