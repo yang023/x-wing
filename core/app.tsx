@@ -1,4 +1,4 @@
-import { createApp, defineComponent, App, Component, Plugin } from "vue";
+import { createApp, App, Component, Plugin } from "vue";
 import { RouterView } from "vue-router";
 
 import router from "./plugins/router";
@@ -52,38 +52,30 @@ export {
 import { setAllUrl } from "./plugins/http-client";
 import { BaseURL } from "./plugins/http-client/index.d";
 
-const layoutContext = require.context("@/", false, /layout.(vue|(j|t)sx?)/);
-const DefaultLayout = defineComponent((_props, { slots }) => {
-  return () => slots.default?.();
-});
-
-const ConfiguratedLayout =
-  layoutContext.keys().length === 1
-    ? layoutContext(layoutContext.keys()[0]).default || DefaultLayout
-    : DefaultLayout;
-
-const starter = async (config?: {
+/**
+ * 屏蔽 app 对象创建逻辑，整合插件设置及其他环境配置
+ * @param config app 启动配置
+ */
+const starter = (config?: {
+  // 对 app 对象进行启动前设置，如进行全局变量输入等
   preset?: (app: App) => void;
+  // 全局配置容器，如 ant-design-vue 中的 ConfigProvider
   wrapper?: Component;
+  // 其他 vue 插件
   plugins?: Plugin[];
-  defaultLayout?: boolean;
+  // 是否禁用 localStorage 和 sessionStorage 的 API, 禁用后调用则报 undefined 错误
   disabledGlobalStorage?: boolean;
+  // 设置接口主机
   baseUrl?: { [key: string]: BaseURL };
 }) => {
   const {
     wrapper,
     plugins = [] as Plugin[],
-    defaultLayout = false,
     disabledGlobalStorage = false,
     baseUrl = null
   } = config || {};
-  const CurrentLayout = defaultLayout ? DefaultLayout : ConfiguratedLayout;
 
-  const Content = () => (
-    <CurrentLayout>
-      <RouterView></RouterView>
-    </CurrentLayout>
-  );
+  const Content = () => <RouterView></RouterView>;
   const _app = createApp(
     wrapper ? (
       <wrapper>
@@ -104,7 +96,13 @@ const starter = async (config?: {
   if (baseUrl) {
     setAllUrl(baseUrl);
   }
-  return (ele: string | HTMLElement) => _app.mount(ele);
+  return {
+    start: (ele: string | HTMLElement, onCreated?: (app: App) => void) => {
+      _app.mount(ele);
+      onCreated?.(_app);
+      console.log(`App is running. Vue version: ${_app.version}`);
+    }
+  };
 };
 
 export default starter;

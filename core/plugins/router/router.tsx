@@ -19,6 +19,17 @@ import createModule from "../store/createModule";
  * TODO: 多层级结构
  */
 const resolveRoutes: () => Array<RouteRecordRaw> = () => {
+  const globalLayoutContext = require.context(
+    "@/",
+    false,
+    /layout.(vue|(j|t)sx?)/
+  );
+
+  const ConfiguratedLayout =
+    globalLayoutContext.keys().length === 1
+      ? globalLayoutContext(globalLayoutContext.keys()[0]).default ||
+        DefaultLayout
+      : DefaultLayout;
   const configContext = require.context("@/views", true, /.*config.(t|j)s$/);
   const layoutContext = require.context(
     "@/views",
@@ -107,7 +118,7 @@ const resolveRoutes: () => Array<RouteRecordRaw> = () => {
 
     const Layout = r.layout
       ? defineAsyncComponent(() => layoutContext(r.layout as string))
-      : DefaultLayout;
+      : ConfiguratedLayout;
     const Content = {
       path: "",
       name: r.name,
