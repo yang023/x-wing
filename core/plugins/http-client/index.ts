@@ -1,6 +1,3 @@
-export {
-  default as useHttpClient,
-  setClient,
-  setSuccessHandler,
-  setErrorHandler
-} from "@core/plugins/http-client/useHttpClient";
+export { default as useHttpClient, setClient } from "./useHttpClient";
+
+export { set as setUrl, setAll as setAllUrl } from "./baseUrl";

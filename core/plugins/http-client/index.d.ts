@@ -10,7 +10,14 @@ export type BaseUrlGetter = (
   version?: string
 ) => string;
 
-export type HttpClientHandler<I, P> = (
+export type HttpClientHandler<I = any, P = any> = (
   baseUrl: BaseUrlGetter,
   fetcher: HttpService<I, P>
 ) => void;
+
+export type BaseUrlContext = {
+  default: string;
+  [version: string]: string;
+};
+
+export type BaseURL = string | BaseUrlContext;

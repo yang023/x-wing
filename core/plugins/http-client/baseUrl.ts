@@ -1,9 +1,4 @@
-type BaseUrlContext = {
-  default: string;
-  [version: string]: string;
-};
-
-type BaseURL = string | BaseUrlContext;
+import { BaseURL, BaseUrlContext } from "./index.d";
 
 const BaseUrl: {
   [key: string]: BaseUrlContext;
@@ -34,7 +29,9 @@ const set = (key: string, base: BaseURL) => {
       default: base
     };
   } else {
-    Object.assign(BaseUrl, base);
+    Object.assign(BaseUrl, {
+      [key]: Object.assign({}, BaseUrl[key] || {}, base)
+    });
   }
 };
 

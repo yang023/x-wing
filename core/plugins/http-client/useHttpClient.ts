@@ -4,6 +4,14 @@ import urlWithPathValues from "./urlWithPathValues";
 import AbstractClient from "./AbstractHttpClient";
 import FetchClient from "./FetchHttpClient";
 import { HttpClientHandler, HttpService } from "./index.d";
+import { computed, ComputedRef, reactive } from "vue";
+import { UnwrapRef } from "vue";
+
+type ErrorDetails = {
+  name: string;
+  error: Error;
+  time: number;
+};
 
 type ClientType<I = any, P = any> = new () => AbstractClient<I, P>;
 
@@ -30,25 +38,6 @@ const setClient = <I, P>(client: ClientType<I, P>) => {
 };
 
 /**
- * 默认回调
- */
-const Callbacks: {
-  onSuccess: <T = any>(res: T) => void;
-  onError: <T = any>(res: T) => void;
-} = {
-  onSuccess: _res => void 0,
-  onError: _error => void 0
-};
-
-const setSuccessHandler = (handler: <T = any>(res: T) => void) => {
-  Callbacks.onSuccess = handler;
-};
-
-const setErrorHandler = (handler: <T = any>(error: T) => void) => {
-  Callbacks.onError = handler;
-};
-
-/**
  * 发送请求
  *
  * @example
@@ -71,12 +60,19 @@ const setErrorHandler = (handler: <T = any>(error: T) => void) => {
  * @param callback 回调
  */
 const useHttpClient = <I = any, P = any>(
-  handler: HttpClientHandler<I, P>,
-  callback: {
-    onSuccess?: (res: P) => void;
-    onError?: (res: P) => void;
-  }
-): void => {
+  handler: HttpClientHandler<I, P>
+): {
+  loading: ComputedRef<boolean>;
+  data: ComputedRef<P>;
+  error: ComputedRef<ErrorDetails>;
+  errors: ComputedRef<ErrorDetails[]>;
+} => {
+  const state = reactive({
+    loading: false,
+    data: (undefined as unknown) as P,
+    error: (undefined as unknown) as ErrorDetails,
+    errors: [] as ErrorDetails[]
+  });
   const fetcher: HttpService<I, P> = (
     url,
     method = "get",
@@ -85,18 +81,44 @@ const useHttpClient = <I = any, P = any>(
   ) => {
     const _url = urlWithPathValues(url, data);
 
+    state.loading = true;
     const instance = Factory.create<I, P>(Contructors.default);
-    instance.setSuccessHandler(callback.onSuccess || Callbacks.onSuccess);
-    instance.setErrorHandler(callback.onError || Callbacks.onError);
-    return instance.send(_url, method, data, headers);
+    return instance
+      .send(_url, method, data, headers)
+      .then(resp => {
+        state.data = resp as UnwrapRef<P>;
+        return resp;
+      })
+      .catch((error: Error) => {
+        const details: ErrorDetails = {
+          name: error.name,
+          error: new Proxy(error, {
+            set: () => false
+          }),
+          time: Date.now()
+        };
+        state.error = details;
+        state.errors.push(details);
+        return error as any;
+      })
+      .finally(() => {
+        state.loading = false;
+      });
   };
 
   handler((key, path, version) => {
     const _url = get(key, version);
     return `${_url}/${path}`;
   }, fetcher);
+
+  return {
+    data: computed(() => state.data) as ComputedRef<P>,
+    loading: computed(() => state.loading),
+    error: computed(() => state.error),
+    errors: computed(() => state.errors)
+  };
 };
 
-export { setClient, setSuccessHandler, setErrorHandler };
+export { setClient };
 
 export default useHttpClient;

@@ -45,9 +45,12 @@ export {
 export {
   useHttpClient,
   setClient,
-  setSuccessHandler,
-  setErrorHandler
+  setUrl,
+  setAllUrl
 } from "./plugins/http-client";
+
+import { setAllUrl } from "./plugins/http-client";
+import { BaseURL } from "./plugins/http-client/index.d";
 
 const layoutContext = require.context("@/", false, /layout.(vue|(j|t)sx?)/);
 const DefaultLayout = defineComponent((_props, { slots }) => {
@@ -65,12 +68,14 @@ const starter = async (config?: {
   plugins?: Plugin[];
   defaultLayout?: boolean;
   disabledGlobalStorage?: boolean;
+  baseUrl?: { [key: string]: BaseURL };
 }) => {
   const {
     wrapper,
     plugins = [] as Plugin[],
     defaultLayout = false,
-    disabledGlobalStorage = false
+    disabledGlobalStorage = false,
+    baseUrl = null
   } = config || {};
   const CurrentLayout = defaultLayout ? DefaultLayout : ConfiguratedLayout;
 
@@ -96,6 +101,9 @@ const starter = async (config?: {
     _app.use(plugin);
   });
 
+  if (baseUrl) {
+    setAllUrl(baseUrl);
+  }
   return (ele: string | HTMLElement) => _app.mount(ele);
 };
 
