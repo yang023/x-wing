@@ -19,6 +19,7 @@ type FieldLayoutComponent = DefineComponent<{
     required: true;
   };
 }>;
+type OptionLayoutComponent = DefineComponent<{}>;
 
 const LayoutComponent = defineComponent({
   setup() {
@@ -30,7 +31,8 @@ const LayoutComponent = defineComponent({
 const FormConfig = {
   layouts: {
     form: LayoutComponent as FormLayoutComponent,
-    field: (LayoutComponent as unknown) as FieldLayoutComponent
+    field: (LayoutComponent as unknown) as FieldLayoutComponent,
+    options: LayoutComponent as OptionLayoutComponent
   },
   size: "default" as FormSize,
   setFormLayout: (layout: FormLayoutComponent) => {
@@ -39,6 +41,10 @@ const FormConfig = {
   },
   setFieldLayout: (layout: FieldLayoutComponent) => {
     FormConfig.layouts.field = layout;
+    return FormConfig;
+  },
+  setOptionsLayout: (layout: OptionLayoutComponent) => {
+    FormConfig.layouts.options = layout;
     return FormConfig;
   },
   setSize: (size: FormSize) => {

@@ -5,6 +5,7 @@ import {
   FieldDisplay,
   FieldProps,
   FieldType,
+  GridUiType,
   ReadonlyFieldState,
   StateCore
 } from "../types.d";
@@ -19,6 +20,10 @@ class Field implements FieldCore {
   readonly valueFormat: string;
   readonly sourceFormat: string;
   readonly link?: string;
+  readonly ui: {
+    labelCol: GridUiType;
+    wrapperCol: GridUiType;
+  };
   value: any;
   initialValue: any;
 
@@ -32,6 +37,10 @@ class Field implements FieldCore {
     this.valueFormat = props.valueFormat || props.name;
     this.sourceFormat = props.sourceFormat || props.name;
     this.link = props.link;
+    this.ui = {
+      labelCol: props.labelCol || ((null as unknown) as GridUiType),
+      wrapperCol: props.wrapperCol || ((null as unknown) as GridUiType)
+    };
 
     this.display = {
       label: props.label || "",
@@ -53,6 +62,7 @@ class Field implements FieldCore {
           { editable: true, disabled: false, visibled: true }
         );
   }
+
   setDisplay(display: Partial<FieldDisplay>) {
     Object.assign(this.display, display);
   }

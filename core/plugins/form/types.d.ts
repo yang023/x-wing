@@ -35,12 +35,36 @@ export type DisplayFieldProps = {
   disabledTime: (current: moment.Moment) => boolean;
 };
 
+export type FormLayout = "horizontal" | "vertical" | "inline";
+export type GridLayout = {
+  span: number;
+  offset: number;
+};
+export type GridUiType = Partial<GridLayout> | Partial<DisplayGridType>;
+
+export type DisplayGridType = {
+  xs: Partial<GridLayout>;
+  sm: Partial<GridLayout>;
+  md: Partial<GridLayout>;
+  lg: Partial<GridLayout>;
+  xl: Partial<GridLayout>;
+  xxl: Partial<GridLayout>;
+};
+
 export type FieldProps = Required<RequiredFieldProps> &
-  Partial<DefaultFieldProps & DisplayFieldProps>;
+  Partial<DefaultFieldProps & DisplayFieldProps> &
+  Partial<{
+    labelCol: GridUiType;
+    wrapperCol: GridUiType;
+  }>;
 
 export type FormProps = {
   id: string;
   fields: FieldProps[];
+  ui?: Partial<{
+    layout: FormLayout;
+    grid: GridUiType;
+  }>;
 };
 
 // 事件中心
@@ -104,6 +128,10 @@ export interface FieldCore {
   link?: string;
   value: any;
   initialValue?: any;
+  readonly ui: {
+    labelCol: GridUiType;
+    wrapperCol: GridUiType;
+  };
 
   readonly display: Partial<FieldDisplay>;
 
@@ -160,6 +188,8 @@ export type FormState = Connect<ReadonlyFormState, ChangeableFormState>;
 export interface FormCore<T = NestedData> {
   readonly id: string;
   readonly data: FormData<T>;
+
+  readonly layout: FormLayoutType;
 
   readonly state: StateCore<ReadonlyFormState, ChangeableFormState>;
   readonly fields: FieldCore[];

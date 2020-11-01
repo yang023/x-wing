@@ -10,13 +10,21 @@ import {
 } from "../types";
 import State from "./State";
 
+type FormConfig = {
+  layout: "horizontal" | "vertical" | "inline";
+};
+
 class Form<T> implements FormCore<T> {
   readonly id: string;
   readonly data: FormData<T>;
   readonly state: StateCore<ReadonlyFormState, ChangeableFormState>;
   readonly fields: FieldCore[];
+
+  readonly layout: "horizontal" | "vertical" | "inline";
+
   constructor(
     id: string,
+    config?: Partial<FormConfig>,
     state?: StateCore<ReadonlyFormState, ChangeableFormState>
   ) {
     this.id = id;
@@ -28,6 +36,7 @@ class Form<T> implements FormCore<T> {
           { disabled: false, editable: true }
         );
     this.fields = [];
+    this.layout = config?.layout || "inline";
   }
 
   addField(field: FieldCore): void {

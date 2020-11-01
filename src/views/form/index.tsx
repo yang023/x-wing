@@ -17,7 +17,10 @@ export default defineComponent(() => {
         label: "Start Date",
         type: "date",
         defaultValue: new Date(),
-        link: "startDate"
+        link: "startDate",
+        labelCol: {
+          span: 4
+        }
       },
       {
         name: "endDate",
@@ -71,37 +74,47 @@ export default defineComponent(() => {
   );
 
   return () => (
-    <div style="width: 500px;margin:10px auto;">
-      <XForm form={form}></XForm>
-      <XAsnycButton
-        type="primary"
-        click={done => {
-          // 异步按钮，调用 done 取消 loading 状态
-          form.validate(errors => {
-            setTimeout(() => {
-              console.log(errors);
-              done();
-            }, 1000);
-          });
+    <>
+      <XForm
+        form={form}
+        v-slots={{
+          options: () => {
+            return (
+              <>
+                <XAsnycButton
+                  type="primary"
+                  click={done => {
+                    // 异步按钮，调用 done 取消 loading 状态
+                    form.validate(errors => {
+                      setTimeout(() => {
+                        console.log(errors);
+                        done();
+                      }, 1000);
+                    });
+                  }}
+                >
+                  Validate
+                </XAsnycButton>
+                <XButton
+                  type="danger"
+                  onClick={() => {
+                    form.clearData();
+                  }}
+                >
+                  ClearData
+                </XButton>
+                <XButton
+                  onClick={() => {
+                    form.resetData();
+                  }}
+                >
+                  ResetData
+                </XButton>
+              </>
+            );
+          }
         }}
-      >
-        Validate
-      </XAsnycButton>
-      <XButton
-        type="danger"
-        onClick={() => {
-          form.clearData();
-        }}
-      >
-        ClearData
-      </XButton>
-      <XButton
-        onClick={() => {
-          form.resetData();
-        }}
-      >
-        ResetData
-      </XButton>
-    </div>
+      ></XForm>
+    </>
   );
 });

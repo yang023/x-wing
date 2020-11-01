@@ -11,10 +11,10 @@ const XForm = defineComponent({
       required: true
     }
   },
-  setup(props) {
+  setup(props, { slots }) {
     return () => (
       <Provider form={props.form}>
-        <Content></Content>
+        <Content v-slots={slots}></Content>
       </Provider>
     );
   }

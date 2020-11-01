@@ -9,6 +9,7 @@ import TimePicker from "./TimePicker";
 
 import DefaultFieldLayout from "./DefaultFieldLayout";
 import DefaultFormLayout from "./DefaultFormLayout";
+import DefaultOptionsLayout from "./DefaultOptionsLayout";
 
 setComponent("Input", Input);
 setComponent("Password", Input);
@@ -20,3 +21,4 @@ setComponent("Time", TimePicker);
 
 FormConfig.setFieldLayout(DefaultFieldLayout);
 FormConfig.setFormLayout(DefaultFormLayout);
+FormConfig.setOptionsLayout(DefaultOptionsLayout);

@@ -18,4 +18,14 @@ const isBoolean = (_source: any) => is(_source, TypeMap.Boolean);
 const isArray = (_source: any) => is(_source, TypeMap.Array);
 const isFunction = (_source: any) => is(_source, TypeMap.Function);
 
-export { isObject, isNumber, isString, isBoolean, isArray, isFunction };
+const isExist = (value: any) => value !== null && value !== undefined;
+
+export {
+  isObject,
+  isNumber,
+  isString,
+  isBoolean,
+  isArray,
+  isFunction,
+  isExist
+};

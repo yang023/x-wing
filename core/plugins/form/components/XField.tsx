@@ -1,4 +1,4 @@
-import { defineComponent, shallowRef, PropType, ref } from "vue";
+import { defineComponent, shallowRef, PropType, ref, readonly } from "vue";
 import { onFieldOptionChange, onFieldStateChange } from "@core/plugins/form";
 import { FieldCore, FieldType } from "@core/plugins/form/types";
 
@@ -43,7 +43,9 @@ const useField = (field: FieldCore) => {
     });
   });
 
-  return { name, state, option };
+  const ui = readonly(field.ui);
+
+  return { name, state, option, ui };
 };
 
 export { useField };

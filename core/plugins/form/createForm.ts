@@ -181,7 +181,7 @@ const createForm = <T = any>(config: FormProps) => {
     { loading: false, submitting: false },
     { disabled: false, editable: true }
   );
-  const _form = new Form(id, $formState);
+  const _form = new Form(id, {}, $formState);
 
   const form = createProxy((_form as unknown) as FormCore<T>, {
     addField: (_addField, target) => {

@@ -22,6 +22,8 @@ const DefaultFieldLayout = defineComponent({
         validateStatus={field.state.value.error ? "error" : ""}
         help={field.option.value.errors}
         extra={field.option.value.tips}
+        labelCol={field.ui.labelCol}
+        wrapperCol={field.ui.wrapperCol}
       >
         {slots.default?.()}
       </XFormItem>

@@ -100,7 +100,12 @@ const SplitMenuLayout = defineComponent({
               }}
             ></XMenu>
           </Layout.LayoutHeader>
-          <Layout.LayoutContent class={LayoutStyle.scrollerWrapper}>
+          <Layout.LayoutContent
+            class={[
+              LayoutStyle.scrollerWrapper,
+              LayoutStyle.layouotPageContent
+            ]}
+          >
             {slots.default?.()}
           </Layout.LayoutContent>
         </Layout.LayoutWrapper>

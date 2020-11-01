@@ -48,8 +48,9 @@ const SplitMenuLayout = defineComponent({
             }}
           ></XMenu>
         </Layout.LayoutSider>
-        <Layout.LayoutWrapper class={LayoutStyle.overflowWrapper}>
-          <Layout.LayoutContent class={LayoutStyle.scrollerWrapper}>
+        <Layout.LayoutWrapper class={LayoutStyle.scrollerWrapper}>
+          <Layout.LayoutHeader></Layout.LayoutHeader>
+          <Layout.LayoutContent class={LayoutStyle.layouotPageContent}>
             {slots.default?.()}
           </Layout.LayoutContent>
         </Layout.LayoutWrapper>

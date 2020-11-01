@@ -11,6 +11,10 @@
   width: 100vw;
 }
 
+.layouot-page-content {
+  padding: 20px;
+}
+
 .layout-settings-triggeer {
   position: fixed;
   right:0;
