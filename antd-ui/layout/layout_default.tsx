@@ -33,20 +33,18 @@ const SplitMenuLayout = defineComponent({
       <Layout.LayoutWrapper
         class={[LayoutStyle.layoutOuter, LayoutStyle.overflowWrapper]}
       >
-        <Layout.LayoutSider
-          class={LayoutStyle.overflowWrapper}
-          breakpoint="lg"
-          collapsed-width="0"
-        >
-          <XMenu
-            mode="inline"
-            config={config.value}
-            open={sider.open.value}
-            current={sider.current.value}
-            onClick={key => {
-              router.push({ name: key });
-            }}
-          ></XMenu>
+        <Layout.LayoutSider breakpoint="lg" collapsedWidth={0}>
+          <div class={LayoutStyle.overflowWrapper}>
+            <XMenu
+              mode="inline"
+              config={config.value}
+              open={sider.open.value}
+              current={sider.current.value}
+              onClick={key => {
+                router.push({ name: key });
+              }}
+            ></XMenu>
+          </div>
         </Layout.LayoutSider>
         <Layout.LayoutWrapper class={LayoutStyle.scrollerWrapper}>
           <Layout.LayoutHeader></Layout.LayoutHeader>

@@ -11,3 +11,5 @@ export { XDatePicker } from "./DatePicker";
 
 // others
 export { XDrawer } from "./Drawer";
+export { XCard } from "./Card";
+export { XCol, XRow } from "./Gird";

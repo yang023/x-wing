@@ -2,16 +2,24 @@ import { Path } from "cool-path";
 import {
   ChangeableFormState,
   FieldCore,
+  FieldGroup,
   FormCore,
   FormData,
   FormValidationResult,
+  GridUiType,
   ReadonlyFormState,
   StateCore
 } from "../types";
 import State from "./State";
 
 type FormConfig = {
-  layout: "horizontal" | "vertical" | "inline";
+  groups: string | FieldGroup[];
+  ui: Partial<{
+    layout: "horizontal" | "vertical" | "inline";
+    itemLabelCol: GridUiType;
+    itemWrapperCol: GridUiType;
+    itemGrid: GridUiType;
+  }>;
 };
 
 class Form<T> implements FormCore<T> {
@@ -21,6 +29,13 @@ class Form<T> implements FormCore<T> {
   readonly fields: FieldCore[];
 
   readonly layout: "horizontal" | "vertical" | "inline";
+  readonly groups: FieldGroup[];
+
+  readonly itemLayout: {
+    labelCol: GridUiType;
+    wrapperCol: GridUiType;
+  };
+  readonly itemGrid: GridUiType;
 
   constructor(
     id: string,
@@ -36,7 +51,22 @@ class Form<T> implements FormCore<T> {
           { disabled: false, editable: true }
         );
     this.fields = [];
-    this.layout = config?.layout || "inline";
+
+    const { groups = "default", ui } = config || {};
+    const { layout = "inline", itemLabelCol, itemWrapperCol, itemGrid } =
+      ui || {};
+    this.layout = layout || "inline";
+    if (typeof groups === "string") {
+      this.groups = [{ name: groups, title: "" }];
+    } else {
+      this.groups = [...groups];
+    }
+    this.itemLayout = {
+      labelCol: itemLabelCol as GridUiType,
+      wrapperCol: itemWrapperCol as GridUiType
+    };
+    this.itemGrid = itemGrid as GridUiType;
+    console.log(this, ui);
   }
 
   addField(field: FieldCore): void {

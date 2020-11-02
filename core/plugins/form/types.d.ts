@@ -21,6 +21,7 @@ export type RequiredFieldProps = {
 };
 export type DefaultFieldProps = {
   type: FieldType;
+  group: string;
   rules: RuleItem | RuleItem[];
   defaultValue: any;
   valueFormat: string; // it's name is the default
@@ -58,13 +59,21 @@ export type FieldProps = Required<RequiredFieldProps> &
     wrapperCol: GridUiType;
   }>;
 
+export type FieldGroup = {
+  name: string;
+  title: string;
+};
+
 export type FormProps = {
   id: string;
   fields: FieldProps[];
   ui?: Partial<{
     layout: FormLayout;
-    grid: GridUiType;
+    itemLabelCol: GridUiType;
+    itemWrapperCol: GridUiType;
+    itemGrid: GridUiType;
   }>;
+  groups?: "default" | FieldGroup[];
 };
 
 // 事件中心
@@ -128,6 +137,7 @@ export interface FieldCore {
   link?: string;
   value: any;
   initialValue?: any;
+  readonly group: string;
   readonly ui: {
     labelCol: GridUiType;
     wrapperCol: GridUiType;
@@ -190,6 +200,13 @@ export interface FormCore<T = NestedData> {
   readonly data: FormData<T>;
 
   readonly layout: FormLayoutType;
+  readonly groups: FieldGroup[];
+
+  readonly itemLayout: {
+    labelCol: GridUiType;
+    wrapperCol: GridUiType;
+  };
+  readonly itemGrid: GridUiType;
 
   readonly state: StateCore<ReadonlyFormState, ChangeableFormState>;
   readonly fields: FieldCore[];

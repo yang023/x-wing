@@ -20,6 +20,7 @@ class Field implements FieldCore {
   readonly valueFormat: string;
   readonly sourceFormat: string;
   readonly link?: string;
+  readonly group: string;
   readonly ui: {
     labelCol: GridUiType;
     wrapperCol: GridUiType;
@@ -33,6 +34,7 @@ class Field implements FieldCore {
   ) {
     this.name = props.name;
     this.type = props.type || "input";
+    this.group = props.group || "default";
     this.rules = props.rules as RuleItem | RuleItem[];
     this.valueFormat = props.valueFormat || props.name;
     this.sourceFormat = props.sourceFormat || props.name;

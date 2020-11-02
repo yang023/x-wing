@@ -1,7 +1,7 @@
 import { defineComponent, PropType } from "vue";
 
 import { FieldCore } from "@core/app.d";
-import { useField } from "@core/app";
+import { useField, useForm } from "@core/app";
 
 import { XFormItem } from "../extends";
 
@@ -14,6 +14,7 @@ const DefaultFieldLayout = defineComponent({
   },
   setup(props, { slots }) {
     const field = useField(props.field);
+    const { itemLabelCol, itemWrapperCol } = useForm();
 
     return () => (
       <XFormItem
@@ -22,8 +23,8 @@ const DefaultFieldLayout = defineComponent({
         validateStatus={field.state.value.error ? "error" : ""}
         help={field.option.value.errors}
         extra={field.option.value.tips}
-        labelCol={field.ui.labelCol}
-        wrapperCol={field.ui.wrapperCol}
+        labelCol={field.ui.labelCol || itemLabelCol.value}
+        wrapperCol={field.ui.wrapperCol || itemWrapperCol.value}
       >
         {slots.default?.()}
       </XFormItem>

@@ -11,6 +11,15 @@ type Data = {
 export default defineComponent(() => {
   const { form, created, actions } = createForm<Data>({
     id: "1",
+    groups: [
+      { name: "t1", title: "T1" },
+      { name: "t2", title: "T2" }
+    ],
+    ui: {
+      itemGrid: {
+        span: 12
+      }
+    },
     fields: [
       {
         name: "startDate",
@@ -18,16 +27,15 @@ export default defineComponent(() => {
         type: "date",
         defaultValue: new Date(),
         link: "startDate",
-        labelCol: {
-          span: 4
-        }
+        group: "t1"
       },
       {
         name: "endDate",
         label: "End Date",
         type: "date",
         link: "startDate",
-        rules: { required: true }
+        rules: { required: true },
+        group: "t1"
       }
     ]
   });
