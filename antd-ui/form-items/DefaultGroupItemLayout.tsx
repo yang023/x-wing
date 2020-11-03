@@ -18,8 +18,6 @@ const DefaultFieldLayout = defineComponent({
     }
   },
   setup(props, { slots }) {
-    console.log(props);
-
     return () => <XCol {...props.span}>{slots.default?.()}</XCol>;
   }
 }) as DefineComponent;

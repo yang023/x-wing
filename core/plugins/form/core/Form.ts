@@ -66,7 +66,6 @@ class Form<T> implements FormCore<T> {
       wrapperCol: itemWrapperCol as GridUiType
     };
     this.itemGrid = itemGrid as GridUiType;
-    console.log(this, ui);
   }
 
   addField(field: FieldCore): void {
