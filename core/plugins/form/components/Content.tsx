@@ -10,7 +10,16 @@ const Content = defineComponent((_props, { slots }) => {
 
   const optionsContent = slots.options ? (
     <layouts.value.options>{slots.options()}</layouts.value.options>
-  ) : null;
+  ) : (
+    <layouts.value.options
+      v-slots={{
+        default: slots.default,
+        submit: slots.submit,
+        reset: slots.reset,
+        clear: slots.clear
+      }}
+    ></layouts.value.options>
+  );
 
   return () => (
     <layouts.value.form>
@@ -42,7 +51,9 @@ const Content = defineComponent((_props, { slots }) => {
                 ></layouts.value.group.wrapper>
               );
             })}
-      {optionsContent}
+      <layouts.value.group.wrapper title={""}>
+        {optionsContent}
+      </layouts.value.group.wrapper>
     </layouts.value.form>
   );
 });

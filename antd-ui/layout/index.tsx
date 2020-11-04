@@ -1,7 +1,6 @@
 import { XButton, XDrawer } from "@antd-ui/extends";
 import {
   computed,
-  defineAsyncComponent,
   DefineComponent,
   defineComponent,
   inject,
@@ -9,12 +8,15 @@ import {
   PropType,
   provide,
   Ref,
-  ref
+  ref,
+  watch
 } from "vue";
 import { XForm, createForm, onFieldValueChange } from "@core/app";
 
 import LayoutStyle from "./style.module.css";
 import { NestedItemType } from "./menu";
+import DefaultLayout from "./layout_default";
+import SplitMenuLayout from "./layout_split_menu";
 
 type LayoutInjection = {
   menu: Ref<NestedItemType[]>;
@@ -30,11 +32,11 @@ const layoutMap: {
 } = {
   default: {
     title: "默认",
-    l: defineAsyncComponent(() => import("./layout_default"))
+    l: DefaultLayout
   },
   splitMenu: {
     title: "菜单拆分",
-    l: defineAsyncComponent(() => import("./layout_split_menu"))
+    l: SplitMenuLayout
   }
 };
 const LayoutInjectionKey: InjectionKey<LayoutInjection> = Symbol();
@@ -80,6 +82,13 @@ const Layout = defineComponent({
     provide(LayoutInjectionKey, {
       menu: ref(props.menu)
     });
+
+    watch(
+      () => layoutKey.value,
+      () => {
+        console.log(layoutKey.value);
+      }
+    );
 
     return () => (
       <>

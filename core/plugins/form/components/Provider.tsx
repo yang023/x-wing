@@ -21,6 +21,7 @@ import {
 
 type FormContext = {
   id: string;
+  instance: ComputedRef<FormCore>;
   fields: ComputedRef<FieldCore[]>;
   data: ComputedRef<FormData>;
   state: ComputedRef<FormState>;
@@ -53,6 +54,7 @@ const Provider = defineComponent({
 
     provide(FormInjection, {
       id: props.form.id,
+      instance: computed(() => props.form),
       fields: computed(() => fields.value),
       data: computed(() => data.value),
       state: computed(() => state.value),

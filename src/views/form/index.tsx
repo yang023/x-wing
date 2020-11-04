@@ -86,39 +86,45 @@ export default defineComponent(() => {
       <XForm
         form={form}
         v-slots={{
-          options: () => {
+          submit: () => {
             return (
-              <>
-                <XAsnycButton
-                  type="primary"
-                  click={done => {
-                    // 异步按钮，调用 done 取消 loading 状态
+              <XAsnycButton
+                type="primary"
+                click={done => {
+                  // 异步按钮，调用 done 取消 loading 状态
+                  setTimeout(() => {
                     form.validate(errors => {
-                      setTimeout(() => {
-                        console.log(errors);
-                        done();
-                      }, 1000);
+                      console.log(errors);
+                      done();
                     });
-                  }}
-                >
-                  Validate
-                </XAsnycButton>
-                <XButton
-                  type="danger"
-                  onClick={() => {
-                    form.clearData();
-                  }}
-                >
-                  ClearData
-                </XButton>
-                <XButton
-                  onClick={() => {
-                    form.resetData();
-                  }}
-                >
-                  ResetData
-                </XButton>
-              </>
+                  }, 1000);
+                }}
+              >
+                Validate
+              </XAsnycButton>
+            );
+          },
+          clear: () => {
+            return (
+              <XButton
+                type="danger"
+                onClick={() => {
+                  form.clearData();
+                }}
+              >
+                ClearData
+              </XButton>
+            );
+          },
+          reset: () => {
+            return (
+              <XButton
+                onClick={() => {
+                  form.resetData();
+                }}
+              >
+                ResetData
+              </XButton>
             );
           }
         }}
