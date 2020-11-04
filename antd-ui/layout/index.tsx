@@ -8,10 +8,9 @@ import {
   PropType,
   provide,
   Ref,
-  ref,
-  watch
+  ref
 } from "vue";
-import { XForm, createForm, onFieldValueChange } from "@core/app";
+import { XForm, createForm, onFieldValueChange, useStorage } from "@core/app";
 
 import LayoutStyle from "./style.module.css";
 import { NestedItemType } from "./menu";
@@ -46,11 +45,29 @@ const Layout = defineComponent({
     menu: {
       type: Array as PropType<NestedItemType[]>,
       required: true
+    },
+    layouts: {
+      type: Array as PropType<LayoutType[]>,
+      default: () => Object.keys(layoutMap) as LayoutType[]
     }
   },
   setup(props, { slots }) {
-    const layoutKey = ref("default" as LayoutType);
-    const Component = computed(() => layoutMap[layoutKey.value].l);
+    const storage = useStorage("local");
+
+    // 当前 layout 值保存到 storage 中
+    const _layout = ref("default" as LayoutType);
+    const layoutKey = computed({
+      get: () => {
+        return storage.getItem<LayoutType>("layout") || "default";
+      },
+      set: val => {
+        _layout.value = val;
+        storage.setItem<LayoutType>("layout", val);
+      }
+    });
+    _layout.value = layoutKey.value;
+
+    const Component = computed(() => layoutMap[_layout.value].l);
 
     const drawerVisible = ref(false);
     const setDrawerVisible = (_visible: boolean) => {
@@ -65,12 +82,14 @@ const Layout = defineComponent({
           type: "radio",
           label: "布局设置",
           defaultValue: "default",
-          eumns: Object.keys(layoutMap).map(key => {
-            return {
-              value: key,
-              title: layoutMap[key as LayoutType].title
-            };
-          })
+          eumns: Object.keys(layoutMap)
+            .filter(key => props.layouts.includes(key as LayoutType))
+            .map(key => {
+              return {
+                value: key,
+                title: layoutMap[key as LayoutType].title
+              };
+            })
         }
       ]
     });
@@ -83,22 +102,25 @@ const Layout = defineComponent({
       menu: ref(props.menu)
     });
 
-    watch(
-      () => layoutKey.value,
-      () => {
-        console.log(layoutKey.value);
-      }
-    );
-
     return () => (
       <>
         <XDrawer
+          title="设置面板"
           visible={drawerVisible.value}
           onClose={() => {
             setDrawerVisible(false);
           }}
         >
-          <XForm form={form}></XForm>
+          <XForm
+            form={form}
+            getFormOptions={resolve => {
+              resolve({
+                bodyStyle: {
+                  padding: 0
+                }
+              });
+            }}
+          ></XForm>
         </XDrawer>
         <div class={LayoutStyle.layoutSettingsTriggeer}>
           <XButton

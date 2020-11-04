@@ -6,18 +6,18 @@ import { FieldCore } from "../types";
 
 type FormSize = "default" | "small" | "large" | "medium";
 
-type FormLayoutComponent = DefineComponent;
-type FieldLayoutComponent = DefineComponent<{
+export type FormLayoutComponent = DefineComponent;
+export type FieldLayoutComponent = DefineComponent<{
   field: {
     type: PropType<FieldCore>;
     required: true;
   };
 }>;
-type OptionLayoutComponent = DefineComponent;
-type FieldGroupLayoutComponent = DefineComponent<{
+export type OptionLayoutComponent = DefineComponent;
+export type GroupLayoutComponent = DefineComponent<{
   title: {
     type: PropType<string>;
-    required: true;
+    default: "";
   };
 }>;
 type FieldGroupItemLayoutComponent = DefineComponent;
@@ -35,7 +35,7 @@ const FormConfig = {
     field: LayoutComponent as FieldLayoutComponent,
     options: LayoutComponent as OptionLayoutComponent,
     group: {
-      wrapper: LayoutComponent as FieldGroupLayoutComponent,
+      wrapper: LayoutComponent as GroupLayoutComponent,
       item: LayoutComponent as FieldGroupItemLayoutComponent
     }
   },
@@ -45,7 +45,7 @@ const FormConfig = {
     return FormConfig;
   },
   setFieldGroupLayout: (
-    wrapper: FieldGroupLayoutComponent,
+    wrapper: GroupLayoutComponent,
     item: FieldGroupItemLayoutComponent
   ) => {
     FormConfig.layouts.group = {

@@ -9,11 +9,17 @@ const XForm = defineComponent({
     form: {
       type: Object as PropType<FormCore>,
       required: true
+    },
+    getFormOptions: {
+      type: Function as PropType<
+        (resolve: <T = any>(optionos: T) => void) => void
+      >,
+      default: null
     }
   },
   setup(props, { slots }) {
     return () => (
-      <Provider form={props.form}>
+      <Provider form={props.form} getFormOptions={props.getFormOptions}>
         <Content v-slots={slots}></Content>
       </Provider>
     );

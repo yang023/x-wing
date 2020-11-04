@@ -199,7 +199,7 @@ export interface FormCore<T = NestedData> {
   readonly id: string;
   readonly data: FormData<T>;
 
-  readonly layout: FormLayoutType;
+  readonly layout: FormLayout;
   readonly groups: FieldGroup[];
 
   readonly itemLayout: {

@@ -5,6 +5,7 @@ import {
   FieldGroup,
   FormCore,
   FormData,
+  FormLayout,
   FormValidationResult,
   GridUiType,
   ReadonlyFormState,
@@ -28,7 +29,7 @@ class Form<T> implements FormCore<T> {
   readonly state: StateCore<ReadonlyFormState, ChangeableFormState>;
   readonly fields: FieldCore[];
 
-  readonly layout: "horizontal" | "vertical" | "inline";
+  readonly layout: FormLayout;
   readonly groups: FieldGroup[];
 
   readonly itemLayout: {

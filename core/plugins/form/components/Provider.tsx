@@ -4,6 +4,7 @@ import {
   defineComponent,
   inject,
   InjectionKey,
+  onMounted,
   PropType,
   provide,
   ref
@@ -30,6 +31,7 @@ type FormContext = {
   itemLabelCol: ComputedRef<GridUiType>;
   itemWrapperCol: ComputedRef<GridUiType>;
   itemGrid: ComputedRef<GridUiType>;
+  options: ComputedRef<any>;
 };
 const FormInjection: InjectionKey<FormContext> = Symbol();
 
@@ -38,18 +40,30 @@ const Provider = defineComponent({
     form: {
       type: Object as PropType<FormCore>,
       required: true
+    },
+    getFormOptions: {
+      type: Function as PropType<
+        (resolve: <T = object>(optionos: T) => void) => void
+      >,
+      default: null
     }
   },
   setup(props, { slots }) {
     const fields = ref(props.form.fields);
     const data = ref(props.form.data);
     const state = ref(props.form.state.getState());
+    const options = ref({});
 
     onFormValueChange(value => {
       data.value = value;
     });
     onFormStateChange("*", () => {
       state.value = props.form.state.getState();
+    });
+    onMounted(() => {
+      props.getFormOptions?.(data => {
+        options.value = data;
+      });
     });
 
     provide(FormInjection, {
@@ -62,7 +76,8 @@ const Provider = defineComponent({
       layout: computed(() => props.form.layout),
       itemLabelCol: computed(() => props.form.itemLayout.labelCol),
       itemWrapperCol: computed(() => props.form.itemLayout.wrapperCol),
-      itemGrid: computed(() => props.form.itemGrid)
+      itemGrid: computed(() => props.form.itemGrid),
+      options: computed(() => options.value)
     });
     return () => slots.default?.();
   }
